@@ -1,0 +1,13 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+__pycache__/
+.venv/
+venv/
+case-data/
+cases/
+outputs/
