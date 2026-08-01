@@ -1,5 +1,7 @@
 # AI Legal Case Workflow
 
+当前版本：**v2.2.1** · 许可证：[CC BY-NC 4.0](LICENSE)
+
 ## 关于作者与合作
 
 **程建都律师**，北京海润天睿（郑州）律师事务所高级合伙人、管委会成员。长期从事复杂商事争议解决、股东股权纠纷和企业应收账款回收，并持续探索 AI 在诉讼办案、律师团队协作和法律产品中的真实应用。
@@ -14,9 +16,9 @@
 - 河南省律师协会信息化建设委员会委员
 - 河南省人工智能学会法律专业委员会顾问
 
-关注与交流：[GitHub](https://github.com/jackcheng459) · [小红书](https://xhslink.cn/m/AtZfuzyjIlt) · [抖音](https://v.douyin.com/ImO-DmtKjD8/)
+关注与交流：[GitHub](https://github.com/jackcheng459) · [小红书](https://xhslink.cn/m/AtZfuzyjIlt) · [抖音](https://v.douyin.com/ImO-DmtKjD8/) · 微信号：`wx1811985798`
 
-欢迎围绕法律 AI 工作流、民事诉讼实务和 Skill 共建交流。添加个人微信时，可备注“法律 AI Skill”。
+欢迎围绕法律 AI 工作流、民事诉讼实务和 Skill 共建交流。添加个人微信时，可搜索微信号 `wx1811985798`，并备注“法律 AI Skill”。
 
 <table>
   <tr>
@@ -77,6 +79,20 @@
 
 可通过 `start_stage` 和 `end_stage` 指定执行范围。简单案件可由一个 Agent 依次完成；复杂案件可在“阶段3：起诉材料制作”和“阶段5：应诉材料包制作”中启用多个子代理并行协作。
 
+## 版本迭代
+
+开发侧“技能版本存档”目录已保留 v1.0.0 至 v2.2.1 五个版本序列，并单独保存 v2.2.1 修订前源包。公开仓库当前以 **v2.2.1** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
+
+| 版本 | 主要变化 | 定位 |
+|---|---|---|
+| v1.0.0 | 建立诉前分析、主体核查、反诉分析、应诉材料、庭审文书和格式交付六阶段流程 | 以被告方应诉为主线的初始版本 |
+| v2.0.0 | 新增“起诉材料制作”阶段，由六阶段扩展为七阶段；增加原告方起诉路径，与被告方应诉路径并行 | 双路径重大升级 |
+| v2.1.0 | 扩充快速开始、触发示例、异常重试与回退、反模式和常见问题 | 强化可用性与鲁棒性 |
+| v2.2.0 | 增加按需阅读导航、适用性快速判断、新手常见错误和更完整的 FAQ；扩充案例复盘 | 降低上手门槛，增强经验复用 |
+| v2.2.1 | 同步实战案例参考和作者维护信息；公开仓库版同时修复乱码、规范 frontmatter、校准数据边界与工具重试表述，并启用 CC BY-NC 4.0 | 当前稳定版本 |
+
+历史 ZIP 用于追溯原始版本，不直接作为当前安装包。使用时请以仓库当前文件和变更记录为准。
+
 ## 仓库结构
 
 ```text
@@ -86,18 +102,23 @@ ai-legal-case-workflow/
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── SECURITY.md
+├── LICENSE
+├── NOTICE.md
 ├── assets/
 │   ├── chenglv-jinhualun-qrcode.png
 │   └── wechat-qrcode.png
 └── references/
+    ├── case-study.md
     ├── templates.md
     └── quality-checklist.md
 ```
 
 - `SKILL.md`：工作流入口、阶段规则和工具说明。
 - `assets/`：README 使用的公众号与个人微信二维码。
+- `references/case-study.md`：已脱敏演示案件的执行复盘，案例指标不构成通用性能承诺。
 - `references/templates.md`：七个阶段的输出模板。
 - `references/quality-checklist.md`：分阶段质量检查清单。
+- `LICENSE` 与 `NOTICE.md`：CC BY-NC 4.0 完整文本、版权范围和商业授权说明。
 
 ## 安装
 
@@ -206,8 +227,10 @@ output_formats: ["md"]
 
 ## 版本记录
 
-版本信息统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
+当前版本为 **v2.2.1**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
 
-## 许可证状态
+## 许可证
 
-本仓库当前未声明开源许可证。公开可见不等于自动授权复制、修改、再发布或商业使用。需要复用或分发时，请先取得仓库权利人的明确许可。
+除另有注明外，本仓库采用 [Creative Commons Attribution-NonCommercial 4.0 International](LICENSE) 许可：允许在署名、标注修改并保持非商业用途的前提下复制、分享和改编。
+
+CC BY-NC 4.0 不允许以商业利益或金钱报酬为主要目的使用。商业培训、付费产品集成及其他商业用途需要另行取得书面授权。姓名、肖像、二维码、账号标识、律所名称和第三方材料的边界见 [NOTICE.md](NOTICE.md)。
