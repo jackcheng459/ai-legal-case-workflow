@@ -1,14 +1,6 @@
 # AI Legal Case Workflow
 
-面向中国民事诉讼实务的 AI 辅助办案 Skill。
-
-本技能将民事案件办理拆分为七个阶段，提供输入规则、执行步骤、输出模板和质量检查点。它同时支持原告方与被告方视角，适用于合同纠纷、侵权纠纷等民事一审、二审案件。
-
-> 本项目用于辅助律师整理材料、形成分析候选和起草文书。它不能替代律师判断、法源核验、证据原件核对和最终定稿。
-
-[查看 SkillHub 发布页](https://skillhub.cn/skills/user_0e53b359/ai-legal-case-workflow)
-
-## 关于作者
+## 关于作者与合作
 
 **程建都律师**，北京海润天睿（郑州）律师事务所高级合伙人、管委会成员。长期从事复杂商事争议解决、股东股权纠纷和企业应收账款回收，并持续探索 AI 在诉讼办案、律师团队协作和法律产品中的真实应用。
 
@@ -23,6 +15,31 @@
 - 河南省人工智能学会法律专业委员会顾问
 
 关注与交流：[GitHub](https://github.com/jackcheng459) · [小红书](https://xhslink.cn/m/AtZfuzyjIlt) · [抖音](https://v.douyin.com/ImO-DmtKjD8/)
+
+欢迎围绕法律 AI 工作流、民事诉讼实务和 Skill 共建交流。添加个人微信时，可备注“法律 AI Skill”。
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="assets/chenglv-jinhualun-qrcode.png" width="160" alt="程律进化论公众号二维码"/><br/>
+      <sub>公众号：程律进化论</sub>
+    </td>
+    <td align="center">
+      <img src="assets/wechat-qrcode.png" width="160" alt="程建都律师个人微信二维码"/><br/>
+      <sub>个人微信</sub>
+    </td>
+  </tr>
+</table>
+
+## 项目概述
+
+面向中国民事诉讼实务的 AI 辅助办案 Skill。
+
+本技能将民事案件办理拆分为七个阶段，提供输入规则、执行步骤、输出模板和质量检查点。它同时支持原告方与被告方视角，适用于合同纠纷、侵权纠纷等民事一审、二审案件。
+
+> 本项目用于辅助律师整理材料、形成分析候选和起草文书。它不能替代律师判断、法源核验、证据原件核对和最终定稿。
+
+[查看 SkillHub 发布页](https://skillhub.cn/skills/user_0e53b359/ai-legal-case-workflow)
 
 ## 核心能力
 
@@ -69,12 +86,16 @@ ai-legal-case-workflow/
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── SECURITY.md
+├── assets/
+│   ├── chenglv-jinhualun-qrcode.png
+│   └── wechat-qrcode.png
 └── references/
     ├── templates.md
     └── quality-checklist.md
 ```
 
 - `SKILL.md`：工作流入口、阶段规则和工具说明。
+- `assets/`：README 使用的公众号与个人微信二维码。
 - `references/templates.md`：七个阶段的输出模板。
 - `references/quality-checklist.md`：分阶段质量检查清单。
 
