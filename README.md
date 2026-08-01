@@ -2,7 +2,7 @@
 
 > AI Legal Case Workflow
 
-当前版本：**v2.2.1** · 许可证：[CC BY-NC 4.0](LICENSE)
+当前版本：**v2.3.0** · 许可证：[CC BY-NC 4.0](LICENSE)
 
 ## 关于作者与合作
 
@@ -83,7 +83,7 @@
 
 ## 版本迭代
 
-开发侧“技能版本存档”目录已保留 v1.0.0 至 v2.2.1 五个版本序列，并单独保存 v2.2.1 修订前源包。公开仓库当前以 **v2.2.1** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
+开发侧“技能版本存档”目录保留 v1.0.0 至 v2.3.0 六个版本序列，并单独保存 v2.2.1 修订前源包。公开仓库当前以 **v2.3.0** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
 
 | 版本 | 主要变化 | 定位 |
 |---|---|---|
@@ -91,7 +91,8 @@
 | v2.0.0 | 新增“起诉材料制作”阶段，由六阶段扩展为七阶段；增加原告方起诉路径，与被告方应诉路径并行 | 双路径重大升级 |
 | v2.1.0 | 扩充快速开始、触发示例、异常重试与回退、反模式和常见问题 | 强化可用性与鲁棒性 |
 | v2.2.0 | 增加按需阅读导航、适用性快速判断、新手常见错误和更完整的 FAQ；扩充案例复盘 | 降低上手门槛，增强经验复用 |
-| v2.2.1 | 同步实战案例参考和作者维护信息；公开仓库版同时修复乱码、规范 frontmatter、校准数据边界与工具重试表述，并启用 CC BY-NC 4.0 | 当前稳定版本 |
+| v2.2.1 | 同步实战案例参考和作者维护信息；公开仓库版同时修复乱码、规范 frontmatter、校准数据边界与工具重试表述，并启用 CC BY-NC 4.0 | 发布与治理基线 |
+| v2.3.0 | 按 TRACE 评测反馈实施渐进式披露；入口 `SKILL.md` 从 819 行缩减为 186 行，详细流程迁移到五个按需加载模块；补强输入输出契约、工具真实状态和安全重试边界 | 模块化架构升级，七阶段能力保持不变 |
 
 历史 ZIP 用于追溯原始版本，不直接作为当前安装包。使用时请以仓库当前文件和变更记录为准。
 
@@ -111,15 +112,25 @@ ai-legal-case-workflow/
 │   └── wechat-qrcode.png
 └── references/
     ├── case-study.md
+    ├── quality-checklist.md
+    ├── stages-1-2-analysis.md
+    ├── stages-3-5-litigation.md
+    ├── stages-6-7-delivery.md
     ├── templates.md
-    └── quality-checklist.md
+    ├── tooling-and-fallbacks.md
+    └── usage-and-faq.md
 ```
 
-- `SKILL.md`：工作流入口、阶段规则和工具说明。
+- `SKILL.md`：工作流入口、不可绕过的安全门、阶段路由和按需加载规则。
 - `assets/`：README 使用的公众号与个人微信二维码。
 - `references/case-study.md`：已脱敏演示案件的执行复盘，案例指标不构成通用性能承诺。
+- `references/stages-1-2-analysis.md`：诉前案情分析、主体核查与财产保全执行规则。
+- `references/stages-3-5-litigation.md`：起诉、反诉与答辩分析、应诉材料包执行规则。
+- `references/stages-6-7-delivery.md`：庭审工作、格式转换与交付规则。
 - `references/templates.md`：七个阶段的输出模板。
 - `references/quality-checklist.md`：分阶段质量检查清单。
+- `references/tooling-and-fallbacks.md`：外部工具适配、安全重试和异常回退规则。
+- `references/usage-and-faq.md`：触发示例、反模式和常见问题。
 - `LICENSE` 与 `NOTICE.md`：CC BY-NC 4.0 完整文本、版权范围和商业授权说明。
 
 ## 安装
@@ -221,7 +232,8 @@ output_formats: ["md"]
 - 不同 AI 平台的 Skill、MCP 和子代理接口并不统一，需要按实际环境适配。
 - 本技能不直接访问付费法律数据库，也不附带任何数据库账号或 API 凭证。
 - 诉讼费、司法政策、法院提交要求和工具接口可能变化，使用时应重新核验。
-- 当前 `SKILL.md` 内容较长，后续版本将继续拆分执行规则与平台适配说明。
+- 模块化版本必须完整安装 `SKILL.md` 与 `references/`，并保持相对路径不变；仅复制入口文件会缺失详细阶段规则。
+- 执行完整七阶段流程时仍会逐步加载多个参考文件；上下文节省主要体现在单阶段、局部阶段和常见快速任务。
 
 ## 参与完善
 
@@ -229,7 +241,7 @@ output_formats: ["md"]
 
 ## 版本记录
 
-当前版本为 **v2.2.1**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
+当前版本为 **v2.3.0**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
 
 ## 许可证
 
