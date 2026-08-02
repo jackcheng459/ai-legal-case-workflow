@@ -166,7 +166,7 @@ git clone https://github.com/jackcheng459/ai-legal-case-workflow.git
 
 ### SkillHub 专用包
 
-SkillHub 专用包有意保留 `README.md`、作者二维码、数据安全说明和贡献指南，方便下载后离线查看项目定位、核心能力与作者信息。根据平台文件要求，专用包不附带 `LICENSE` 和 `NOTICE.md`；完整许可文本和版权边界以 GitHub 仓库的在线文件为准。
+SkillHub 专用包有意保留 `README.md`、数据安全说明和贡献指南，方便下载后查看项目定位、核心能力与作者信息。因平台不接受公众号和个人微信二维码文件，专用包不包含 `assets/`，其中的 README 以公众号名称、微信号和社交平台文字链接替代二维码区域。GitHub README 与完整版本包继续保留二维码。根据平台文件要求，SkillHub 专用包也不附带 `LICENSE` 和 `NOTICE.md`；完整许可文本和版权边界以 GitHub 仓库的在线文件为准。
 
 ## 快速使用
 
