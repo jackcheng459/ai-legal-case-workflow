@@ -650,10 +650,10 @@
 
 ### MD → PDF
 
-- 工具：md-to-pdf-cjk skill
+- 工具：当前平台已提供且已验证的 PDF 转换能力；不可用时保留 Markdown 或 DOCX 并说明限制
 
 ### PDF → 图片（扫描件处理）
 
-- 工具：pdfkit-py skill 的 `to_images` 功能
+- 工具：当前平台已提供且已验证的 PDF 渲染或 OCR 能力，约 200dpi；不可用时请求用户提供图片版、OCR 版或文本版
 - 参数：dpi=200
 - 输出后使用 Read 工具直接读取图片
