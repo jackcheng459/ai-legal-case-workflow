@@ -1,6 +1,7 @@
 ---
 name: ai-legal-case-workflow
 description: AI辅助民事一审诉讼办案全流程工作流。覆盖诉前分析、主体核查与财产保全、起诉材料制作、反诉分析、应诉材料包制作、庭审文书撰写和格式交付，支持原告方与被告方双路径。本技能应在用户提出民事一审卷宗分析、证据梳理、财产保全评估、起诉或应诉材料准备、庭审材料和代理词起草时使用。刑事、行政、二审、再审、执行专门程序、无具体案件材料的纯咨询、利益冲突场景及判决结果承诺不适用；非一审案件仅可使用材料读取、时间线、证据矩阵和一般争点分析等通用辅助，不得套用一审路由、期限和模板。所有输出仅为律师工作底稿，不能替代律师判断、原始材料核对和法源复核。
+license: CC BY-NC 4.0 - 完整文本见 https://github.com/jackcheng459/ai-legal-case-workflow/blob/main/LICENSE
 ---
 
 # 民事诉讼AI辅助全流程
@@ -94,6 +95,8 @@ output_formats: ["md"]
 
 更多示例、不适用场景、反模式和 FAQ 见 `references/usage-and-faq.md`。
 
+首次使用者如需先看“实际输出长什么样”，按需读取 `references/complete-output-example.md`。该文件使用全虚构事实展示阶段1完整报告、阶段3文书草稿、状态标注和失败回执，不得把示例事实或结论复制到真实案件。
+
 ## 开始前检查
 
 先完成预检，再读取案件材料：
@@ -151,6 +154,9 @@ output_formats: ["md"]
 
 - 阶段产出写入用户指定目录；用户未指定时按“阶段编号_内容类型”建立子目录后再写，不擅自改写卷宗。完整归档树见 `references/stages-6-7-delivery.md`。
 - 每份产出标明事实来源、未核实事项、版本和人工复核状态。
+- 每次阶段回复和产出首页标明 `run_status`，仅使用 `in_progress`、`completed`、`partial`、`blocked`、`waiting_external`。发生异常时同时列出已完成产出、失败步骤、实际尝试次数、未核事项、降级动作、是否可安全重试、恢复位置和需要用户采取的动作；统一格式见 `references/tooling-and-fallbacks.md`。
+- `run_status=completed` 只表示当前约定阶段的预定步骤已经执行，不表示律师审核完成，也不表示 DOCX、PDF 或外部提交已经成功。格式转换和外部状态必须分别验证。
+- 对相同材料重复执行同一阶段时，先核对材料是否变化并复用已通过最低质量检查的产出；只有内容发生变化时才新建版本，不重复发起有费用、写入或外部状态变化的调用。
 - 触发专门领域闸门时，在产出首页状态区标注 `specialist_review_required=true`，同时列出 `specialist_domains`（触发领域）、`trigger_facts`（触发事实）、`pending_questions`（待核验问题）、`blocked_conclusions`（暂不输出的确定性结论）和 `specialist_review_status`（默认 `pending`）。该状态由主代理和阶段质量门读取；只有完成专门法源及专业人员复核并记录复核依据后，才可改为 `cleared` 并继续相应结论。
 - 需要正式模板时，执行前读取 `references/templates.md` 的对应章节。
 - 不覆盖原始材料或已签发文件；使用新版本文件并保留变更记录。
@@ -174,7 +180,7 @@ output_formats: ["md"]
 | 4 反诉与答辩分析 | 拆解对方请求权基础和举证缺口 | 区分本诉与反诉；主动识别我方不利证据 | 反诉分析、构成要件表、应对策略 | `references/stages-3-5-litigation.md` |
 | 5 应诉材料包 | 形成事实、证据、法源相互一致的成套材料 | 简单案件串行；复杂案件可并行，主代理统一复核 | 答辩、证据、质证、法源、发问和调解材料 | `references/stages-3-5-litigation.md` |
 | 6 庭审工作 | 覆盖庭前、庭中记录和庭后补强 | 回应庭审新情况；法庭关注点只用于补强，不据此预测结果 | 庭审提纲、庭审分析、庭后意见 | `references/stages-6-7-delivery.md` |
-| 7 格式与交付 | 转换格式、统一命名并完成归档 | 区分法院、客户、团队版本；交付前复核 | Word、PDF、客户摘要、归档清单 | `references/stages-6-7-delivery.md` |
+| 7 格式与交付 | 转换格式、统一命名并完成归档 | 区分法院、客户、团队版本；交付前复核；只声明实际生成并验证的格式 | 已验证的格式文件，或 Markdown 降级件、客户摘要、归档清单 | `references/stages-6-7-delivery.md` |
 
 ## 按案件类型裁剪
 
@@ -215,6 +221,7 @@ output_formats: ["md"]
 - 北大法宝、元典、企查查等名称只是能力示例，按当前平台可用的权威来源适配。
 - 工具不可用时优先保留已完成的事实分析，标注覆盖不足，不伪造查询结果。
 - 重复调用安全且平台支持时，同一调用最多发起 3 次（含首次），重试间隔与超时判定见 `references/tooling-and-fallbacks.md`；涉及写入、费用或外部状态变化时先判断副作用。
+- 降级不等于不中断，也不等于任务完成。无法继续时返回结构化失败回执并停在可恢复位置；恢复执行时复用已经核验的产出，不重复发起存在副作用的调用。
 - 不自动安装依赖。确需安装时说明用途、范围和影响，并取得用户确认。
 - 技能运行不依赖仓库中的维护脚本；`scripts/check_markdown_links.py` 仅供开发者用 Python 3 标准库检查公开文档链接，不参与案件处理。
 - 扫描 PDF、格式不支持、工具超时、子代理失败等详细处理见 `references/tooling-and-fallbacks.md`。
@@ -230,6 +237,8 @@ output_formats: ["md"]
 - 法定或法院指定期限是否写明起算点、届满日和最后办理日期。
 - 是否区分原始事实、当事人陈述、识别结果、分析推论和策略建议。
 - 是否明确 AI 草稿、律师待复核和律师已定稿三种状态。
+- `run_status` 是否与实际完成范围一致；异常、降级和等待状态是否写明恢复位置。
+- DOCX、PDF、查询、外部发送或法院提交等能力是否真实执行并验证，未验证时是否保留 Markdown 或待办状态。
 - 是否执行 `references/quality-checklist.md` 的“阶段通用检查”和该阶段专项检查。
 
 ## 参考文件加载表
@@ -245,7 +254,8 @@ output_formats: ["md"]
 | `references/templates.md` | 生成相应阶段的固定结构文书时，只读对应章节 |
 | `references/quality-checklist.md` | 每阶段结束和跨阶段复核时，读取“阶段通用检查”和对应阶段章节 |
 | `references/usage-and-faq.md` | 首次使用、判断适用性、回答 FAQ 时；`start_stage > 1` 的跳阶段执行前读取“反模式”一节 |
-| `references/case-study.md` | 需要理解完整案例和效果边界时，可选读取 |
+| `references/complete-output-example.md` | 首次使用者需要查看一份完整、可连续阅读的虚构输出，或需要理解状态标注和失败回执时，可选读取 |
+| `references/case-study.md` | 需要理解已脱敏演示案件的执行复盘、真实片段和效果边界时，可选读取 |
 
 不要一次加载全部 references。较长参考文件只读取与当前阶段、文书和问题直接相关的章节。标注为无条件生效的内容不适用按需裁剪。
 

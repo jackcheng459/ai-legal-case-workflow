@@ -7,6 +7,7 @@
 
 ## 目录
 
+- [通用首页状态块与失败回执](#通用首页状态块与失败回执)
 - [阶段1：案件概要报告模板](#阶段1案件概要报告模板)
 - [阶段2：主体核查报告模板](#阶段2主体核查报告模板)
 - [阶段3：起诉材料包模板](#阶段3起诉材料包模板)
@@ -14,6 +15,36 @@
 - [阶段5：应诉材料包模板](#阶段5应诉材料包模板)
 - [阶段6：庭审文书模板](#阶段6庭审文书模板)
 - [阶段7：格式转换指南](#阶段7格式转换指南)
+
+## 通用首页状态块与失败回执
+
+每份阶段产出首页先放状态块。完整字段含义和恢复规则见 `references/tooling-and-fallbacks.md`。
+
+```yaml
+run_status: in_progress | completed | partial | blocked | waiting_external
+completed_scope:
+  - <本次实际完成的阶段或文书>
+lawyer_review_status: pending | reviewed | finalized
+law_source_status: verified | partial | unverified | not_applicable
+unreadable_or_unverified_items:
+  - <无法读取、缺失或未经核验的事项>
+resume_from: <下一步或恢复位置>
+```
+
+发生异常或外部等待时追加：
+
+```yaml
+failed_step: <阶段和步骤；外部等待时写 waiting_for>
+attempts: <实际尝试次数>
+completed_outputs:
+  - <已完成最低检查的产出>
+fallback_taken: <已执行的降级动作；没有则写 none>
+safe_to_retry: true | false | unknown
+user_action_required:
+  - <需要用户补充、确认或授权的动作>
+```
+
+不要用 `completed` 代替律师审核、格式验证或外部提交状态。完整填充样例见 `references/complete-output-example.md`。
 
 ## 阶段1：案件概要报告模板
 
@@ -646,6 +677,7 @@
 
 ### MD → HTML
 
+- 前提：当前平台能够创建文件并使用浏览器或等效能力验证结果；不满足时保留 Markdown 并说明限制
 - 卡片式布局、渐变背景、响应式设计、打印友好
 - 必须处理：表格渲染、中文排版（字体、行距）、响应式图片
 - 推荐模板结构：头部概览 → 主体卡片 → 侧边导航 → 底部附注
