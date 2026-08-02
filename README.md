@@ -2,7 +2,7 @@
 
 > AI Legal Case Workflow
 
-当前版本：**v2.4.3** · 许可证：[CC BY-NC 4.0](https://github.com/jackcheng459/ai-legal-case-workflow/blob/main/LICENSE)
+当前版本：**v2.5.0** · 许可证：[CC BY-NC 4.0](https://github.com/jackcheng459/ai-legal-case-workflow/blob/main/LICENSE)
 
 ## 关于作者与合作
 
@@ -39,7 +39,7 @@
 
 面向中国民事诉讼实务的 AI 辅助办案 Skill。
 
-本技能将民事案件办理拆分为七个阶段，提供输入规则、执行步骤、输出模板和质量检查点。它同时支持原告方与被告方视角，专门程序覆盖范围为合同纠纷、侵权纠纷等民事一审案件。二审、再审和执行程序的专门规则不在本版覆盖范围，相关案件可使用材料读取、时间线整理、证据矩阵和一般争点分析等通用辅助能力，但不套用一审专用的阶段路由、程序期限和文书模板。
+本技能提供两条相互隔离、共享事实与证据底座的专门路径：民事一审七阶段与民事二审 A0–A6。它支持一审原告与被告，也支持二审上诉人、被上诉人及双方均上诉的独立轨道处理。再审和执行程序不在本版专门范围内。
 
 > 本项目用于辅助律师整理材料、形成分析候选和起草文书。它不能替代律师判断、法源核验、证据原件核对和最终定稿。
 
@@ -47,9 +47,9 @@
 
 ## 核心能力
 
-这不是一个单纯的法律文书生成提示词。它把案件材料、事实分析、主体核查、诉讼策略、文书生产、庭审应对和成果交付组织成一条可分阶段执行、可检查、可回退的办案工作流。
+这不是一个单纯的法律文书生成提示词。它先识别程序，再把案件材料、事实分析、诉讼策略、文书生产、庭审应对和成果交付组织成可分阶段执行、可检查、可回退的办案工作流。
 
-### 七阶段全流程
+### 民事一审七阶段
 
 | 阶段 | 解决的问题 | 关键动作 | 核心产出 |
 |---|---|---|---|
@@ -61,12 +61,28 @@
 | 6. 庭审阶段工作 | 如何让庭前准备、庭审记录和庭后补强形成闭环 | 整合庭审提纲；依法核对法院庭审笔录；记录法庭关注点、双方自认和新证据；补强庭后代理意见并更新调解策略，不据询问方向预测结果 | 庭审提纲、庭审记录、庭审分析报告、庭后代理意见、补证建议 |
 | 7. 格式转换与交付 | 如何把工作底稿转为法院、客户和团队可使用的成果 | 按法院或系统要求准备文件，并为客户和团队生成相应版本；只有当前平台实际生成并验证后才声明 DOCX、PDF 等格式成功，否则保留 Markdown 降级件 | 已验证的法院提交文件或降级件、客户报告、团队底稿、归档清单 |
 
+### 民事二审 A0–A6
+
+| 阶段组 | 解决的问题 | 核心产出 |
+|---|---|---|
+| A0. 入口、期限与费用 | 是否可普通上诉，送达、期限、提交和缴费状态是否安全 | 入口核验表、独立期限轨道、费用与立即行动清单 |
+| A1. 原审裁判拆解 | 原审请求、证据、认定、理由和主文如何对应 | 原审请求与主文表、裁判认定和证据矩阵、程序时间线 |
+| A2. 上诉审计 | 哪些具体错误可能影响裁判结果，如何应对对方上诉 | 独立上诉轨道、裁判错误矩阵、可比较策略选项 |
+| A3. 增量与程序 | 新证据、新请求、遗漏请求或程序问题如何处理 | 增量证据表、证据缺口关闭计划、程序申请清单 |
+| A4. 二审文书材料包 | 如何形成请求、事实、证据和法源一致的二审材料 | 上诉状、答辩状、受控裁定上诉状、证据目录、法源报告 |
+| A5. 庭审或询问 | 如何围绕二审审理范围准备发问、质证、调解与庭后补强 | 庭审或询问提纲、新证据质证、调解授权表、庭后意见 |
+| A6. 裁判与交付 | 如何比较两审裁判并完成客户告知、交接和归档 | 裁判对比、客户报告、后续程序边界、归档清单 |
+
+二审不是“一审阶段8”。一审使用 `start_stage/end_stage`，二审使用 `start_phase/end_phase`，期限、角色和模板相互隔离。
+
 ### 贯穿全流程的能力
 
 - **全量材料读取与事实锚定**：支持 Markdown、PDF、图片及音视频转写文本；无法读取的文件必须记录，不以文件名判断材料是否重要。
 - **证据可追溯**：时间线、事实主张和争议焦点尽量回链到文件名、页码、段落或音视频时间点，区分材料事实、当事人陈述和分析推论。
 - **程序风险前置**：在诉前阶段即检查诉讼时效、协议管辖、法定管辖、仲裁条款、保全必要性和费用风险，避免到立案或庭审阶段才暴露基础问题。
 - **法定期限台账**：逐阶段核算答辩、管辖异议、举证、反诉缴费、诉前保全转诉、续行保全和上诉等期限，写明起算点、届满日和最后办理日期。
+- **二审裁判错误审计**：把上诉请求连接到原审主文、事实认定、证据评价、法律适用、程序问题及其结果影响，不以“原判错误”的空泛结论替代论证。
+- **多方上诉独立轨道**：每份上诉分别记录请求、期限、费用和文书状态，共享事实底座并运行交叉一致性检查。
 - **请求权基础与举证分析**：把诉讼请求拆解为构成要件，逐项评估证据能否满足，并同时识别对方薄弱证据和我方不利材料。
 - **主体穿透与执行前置**：将企业主体、股权变化、信用风险、财产线索和追加责任主体的排查前置到诉讼策略设计阶段。
 - **专门领域核验闸门**：涉外、港澳台、知识产权、海事海商和破产衍生诉讼在当前版本只做识别、风险提示和待核验问题，不把普通合同纠纷规则直接套入专门领域。
@@ -76,7 +92,7 @@
 - **运行状态与恢复**：统一使用 `completed`、`partial`、`blocked`、`waiting_external` 等状态；失败时列明已完成产出、实际尝试次数、未核事项、恢复位置和用户待办，避免重复调用和“降级即完成”。
 - **完整输出样例**：提供全虚构买卖合同欠款纠纷样例，完整展示阶段1报告、阶段3文书草稿、状态块和失败回执；真实脱敏案例继续用于执行复盘，两类材料不混用。
 
-### 原告方与被告方双路径
+### 一审原告与被告双路径
 
 | 代理立场 | 推荐阶段路径 | 工作重点 |
 |---|---|---|
@@ -85,9 +101,11 @@
 
 可通过 `start_stage` 和 `end_stage` 指定执行范围。简单案件可由一个 Agent 依次完成；复杂案件在不突破既有数据、工具和平台授权边界时，可在“阶段3：起诉材料制作”和“阶段5：应诉材料包制作”中启用多个子代理并行协作。
 
+二审根据本方为上诉人、被上诉人或双方均上诉建立一个或多个 `appeal_track`。可以用 `start_phase` 和 `end_phase` 执行局部阶段组，但 A0 的可上诉性、送达、期限和费用核验不得被默认跳过。
+
 ## 版本迭代
 
-开发侧“技能版本存档”目录保留 v1.0.0 至 v2.4.3 的版本序列，并单独保存 v2.2.1 修订前源包及 v2.3.0 评审过程包。公开仓库当前以 **v2.4.3** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
+开发侧“技能版本存档”目录保留 v1.0.0 至 v2.5.0 的版本序列，并单独保存重要评审、裁决和验证过程文件。公开仓库当前以 **v2.5.0** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
 
 | 版本 | 主要变化 | 定位 |
 |---|---|---|
@@ -102,10 +120,11 @@
 | v2.4.1 | 使用符合 SkillHub 文件要求的专用包完成平台分发；技能逻辑和仓库源码与 v2.4.0 一致 | SkillHub 分发序号，无源码功能变更 |
 | v2.4.2 | 优化 `SKILL.md` 首屏的作者、适用对象、七阶段用户视图、核心能力和使用边界；同步 README、CHANGELOG、FAQ 与许可证指向 | 面向 SkillHub 展示和上手体验的内容补丁，不改变功能逻辑 |
 | v2.4.3 | 根据 TRACE 评测补充完整虚构输出样例、统一运行状态、失败回执和恢复协议；收紧格式转换和降级完成状态 | 文档质量与运行可靠性补丁，不改变民事一审七阶段范围 |
+| v2.5.0 | 新增民事二审 A0–A6 专门路径、独立上诉轨道、判决错误审计、二审模板与 D0–D6 质量门；裁定上诉限于三类受控裁定 | 从民事一审扩展到民事一审与二审双程序路径 |
 
 历史 ZIP 用于追溯原始版本，不直接作为当前安装包。使用时请以仓库当前文件和变更记录为准。
 
-后续队列已确定：民事二审专门模块安排为 **v2.5.0**，同时保留裁定上诉子路径，但不扩展为全部裁定救济规则。真实脱敏二审案例与测试基准已获授权，作为非阻塞任务随开发进度推进；在 v2.5.0 发布前，当前版本仍不得套用一审专用路由处理二审案件。
+真实脱敏二审案例与测试基准已获授权，继续作为非阻塞后续任务推进。本版先用全虚构案例覆盖八类二审场景，避免为展示完整性虚构尚未发生的送达、开庭或裁判事件。
 
 ## 仓库结构
 
@@ -122,6 +141,10 @@ ai-legal-case-workflow/
 │   ├── chenglv-jinhualun-qrcode.png
 │   └── wechat-qrcode.png
 └── references/
+    ├── appeal-workflow.md
+    ├── appeal-templates.md
+    ├── appeal-quality-checklist.md
+    ├── appeal-case-examples.md
     ├── case-study.md
     ├── complete-output-example.md
     ├── quality-checklist.md
@@ -142,6 +165,10 @@ ai-legal-case-workflow/
 - `references/stages-6-7-delivery.md`：庭审工作、格式转换与交付规则。
 - `references/templates.md`：七个阶段的输出模板。
 - `references/quality-checklist.md`：分阶段质量检查清单。
+- `references/appeal-workflow.md`：民事二审 A0–A6 工作流、法源锚点与受控裁定上诉边界。
+- `references/appeal-templates.md`：二审期限、裁判拆解、策略、文书、庭审和交付模板。
+- `references/appeal-quality-checklist.md`：二审 D0–D6 质量门和跨文书一致性检查。
+- `references/appeal-case-examples.md`：全虚构二审示例与 T1–T8 场景验收。
 - `references/tooling-and-fallbacks.md`：外部工具适配、安全重试和异常回退规则。
 - `references/usage-and-faq.md`：触发示例、反模式和常见问题。
 - `LICENSE` 与 `NOTICE.md`：CC BY-NC 4.0 完整文本、版权范围和商业授权说明。
@@ -181,11 +208,27 @@ SkillHub 专用包有意保留 `README.md`、数据安全说明和贡献指南�
 请使用 ai-legal-case-workflow 处理一宗设备买卖合同纠纷。
 
 case_type: 设备买卖合同纠纷
+procedure: first_instance
 role: defendant
-case_stage: trial
 materials_path: /path/to/redacted-case
 start_stage: 1
 end_stage: 5
+output_formats: ["md"]
+```
+
+二审示例：
+
+```text
+请使用 ai-legal-case-workflow 拆解一审判决并准备上诉材料。
+
+case_type: 股权转让纠纷
+procedure: second_instance
+original_role: plaintiff
+appeal_role: appellant
+decision_type: judgment
+materials_path: /path/to/redacted-appeal-case
+start_phase: A0
+end_phase: A4
 output_formats: ["md"]
 ```
 
@@ -196,13 +239,17 @@ output_formats: ["md"]
 必需参数：
 
 - `case_type`：案件类型。
+- `procedure`：`first_instance` 或 `second_instance`，决定使用一审七阶段或二审 A0–A6。
 - `materials_path`：卷宗材料目录的绝对路径。
-- `role`：`plaintiff` 或 `defendant`。不提供时流程会先询问，不会默认按原告处理。
+- 一审必需 `role`：`plaintiff` 或 `defendant`。
+- 二审必需 `original_role`、`appeal_role` 与 `decision_type`，并建议提供原审裁判、送达记录、各方上诉材料和缴费状态。
 
 常用可选参数：
 
-- `case_stage`：当前程序阶段，取值见 SKILL.md 的输入输出契约；仅在未给 `start_stage` 时用于推定起始阶段。
+- `case_stage`：一审当前程序阶段，仅在未给 `start_stage` 时用于推定起始阶段。
+- `second_instance_stage`：二审当前程序阶段，仅在未给 `start_phase` 时用于推定切入点；A0 入口核验仍不得默认跳过。
 - `start_stage`、`end_stage`：限定执行阶段。
+- `start_phase`、`end_phase`：限定二审阶段组，范围 A0–A6；不得与一审阶段参数混用。
 - `output_formats`：选择 `md`、`html`、`docx` 或 `pdf`。
 - `parallel_enabled`：是否具备并行执行资格，默认 `true`。它不等于自动启动子代理，也不扩大数据、工具或外部平台授权；简单案件及强依赖任务仍自动串行。
 - `enable_mcp_tools`：指定可用的法律或企业信息工具。
@@ -211,7 +258,7 @@ output_formats: ["md"]
 
 ## 工具与兼容性
 
-本 Skill 的运行主体是 Markdown，不会自动安装依赖。仓库另含一个仅供维护者使用的 Markdown 链接检查脚本 `scripts/check_markdown_links.py`，使用 Python 3 标准库运行，不参与案件处理，也不读取案件材料。
+本 Skill 的运行主体是 Markdown，不会自动安装依赖。仓库含两个仅供维护者使用的 Python 3 标准库脚本：`scripts/check_markdown_links.py` 检查相对链接和目录锚点，`scripts/check_workflow_consistency.py` 检查版本、程序路由、按需加载与 T1–T8 场景基线。它们不参与案件处理，也不读取案件材料。
 
 工作流中出现的北大法宝、元典、企查查、PDF 处理、Word 生成和子代理工具，均依赖使用者所在平台的实际能力。工具名称和调用方式可能需要适配：
 
@@ -220,7 +267,7 @@ output_formats: ["md"]
 - PDF、Word 和多代理工具不可用时，应明确降级状态，不得假装已执行。
 - 任何自动生成的法律结论和正式文书都应由律师复核。
 
-维护者可在仓库根目录运行 `python3 scripts/check_markdown_links.py .`，检查全部 Markdown 相对路径和目录锚点。GitHub Pull Request 也会自动执行同一检查。
+维护者可在仓库根目录运行 `python3 scripts/check_markdown_links.py .` 和 `python3 scripts/check_workflow_consistency.py .`。GitHub Pull Request 会自动执行这两项检查。
 
 ## 数据安全
 
@@ -245,7 +292,7 @@ output_formats: ["md"]
 - 法条和案例是否核实效力状态、案号、法院与裁判日期。
 - 输出是否区分材料事实、当事人陈述、分析推论和策略建议。
 
-完整清单见 [references/quality-checklist.md](references/quality-checklist.md)。
+一审完整清单见 [references/quality-checklist.md](references/quality-checklist.md)，二审 D0–D6 质量门见 [references/appeal-quality-checklist.md](references/appeal-quality-checklist.md)。
 
 ## 已知限制
 
@@ -253,7 +300,7 @@ output_formats: ["md"]
 - 本技能不直接访问付费法律数据库，也不附带任何数据库账号或 API 凭证。
 - 诉讼费、司法政策、法院提交要求和工具接口可能变化，使用时应重新核验。
 - 模块化版本必须完整安装 `SKILL.md` 与 `references/`，并保持相对路径不变；仅复制入口文件会缺失详细阶段规则。
-- 执行完整七阶段流程时仍会逐步加载多个参考文件；上下文节省主要体现在单阶段、局部阶段和常见快速任务。
+- 执行完整一审七阶段或二审 A0–A6 时仍会逐步加载多个参考文件；上下文节省主要体现在局部阶段和常见快速任务。
 
 ## 参与完善
 
@@ -261,7 +308,7 @@ output_formats: ["md"]
 
 ## 版本记录
 
-当前版本为 **v2.4.3**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
+当前版本为 **v2.5.0**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
 
 ## 许可证
 
