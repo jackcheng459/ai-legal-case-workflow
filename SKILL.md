@@ -109,6 +109,7 @@ output_formats: ["md"]
 
 - 阶段产出写入用户指定目录；用户未指定时按“阶段编号_内容类型”建立子目录后再写，不擅自改写卷宗。完整归档树见 `references/stages-6-7-delivery.md`。
 - 每份产出标明事实来源、未核实事项、版本和人工复核状态。
+- 触发专门领域闸门时，在产出首页状态区标注 `specialist_review_required=true`，同时列出 `specialist_domains`（触发领域）、`trigger_facts`（触发事实）、`pending_questions`（待核验问题）、`blocked_conclusions`（暂不输出的确定性结论）和 `specialist_review_status`（默认 `pending`）。该状态由主代理和阶段质量门读取；只有完成专门法源及专业人员复核并记录复核依据后，才可改为 `cleared` 并继续相应结论。
 - 需要正式模板时，执行前读取 `references/templates.md` 的对应章节。
 - 不覆盖原始材料或已签发文件；使用新版本文件并保留变更记录。
 
@@ -173,6 +174,7 @@ output_formats: ["md"]
 - 工具不可用时优先保留已完成的事实分析，标注覆盖不足，不伪造查询结果。
 - 重复调用安全且平台支持时，同一调用最多发起 3 次（含首次），重试间隔与超时判定见 `references/tooling-and-fallbacks.md`；涉及写入、费用或外部状态变化时先判断副作用。
 - 不自动安装依赖。确需安装时说明用途、范围和影响，并取得用户确认。
+- 技能运行不依赖仓库中的维护脚本；`scripts/check_markdown_links.py` 仅供开发者用 Python 3 标准库检查公开文档链接，不参与案件处理。
 - 扫描 PDF、格式不支持、工具超时、子代理失败等详细处理见 `references/tooling-and-fallbacks.md`。
 
 ## 质量控制

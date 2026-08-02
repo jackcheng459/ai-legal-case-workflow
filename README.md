@@ -200,7 +200,7 @@ output_formats: ["md"]
 
 ## 工具与兼容性
 
-本仓库是纯 Markdown Skill，不包含可执行脚本，也不会自动安装依赖。
+本 Skill 的运行主体是 Markdown，不会自动安装依赖。仓库另含一个仅供维护者使用的 Markdown 链接检查脚本 `scripts/check_markdown_links.py`，使用 Python 3 标准库运行，不参与案件处理，也不读取案件材料。
 
 工作流中出现的北大法宝、元典、企查查、PDF 处理、Word 生成和子代理工具，均依赖使用者所在平台的实际能力。工具名称和调用方式可能需要适配：
 
@@ -208,6 +208,8 @@ output_formats: ["md"]
 - 企业查询应先确认完整企业登记名称或统一社会信用代码。
 - PDF、Word 和多代理工具不可用时，应明确降级状态，不得假装已执行。
 - 任何自动生成的法律结论和正式文书都应由律师复核。
+
+维护者可在仓库根目录运行 `python3 scripts/check_markdown_links.py .`，检查全部 Markdown 相对路径和目录锚点。GitHub Pull Request 也会自动执行同一检查。
 
 ## 数据安全
 
