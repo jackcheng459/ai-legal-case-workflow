@@ -2,7 +2,7 @@
 
 > AI Legal Case Workflow
 
-当前版本：**v2.4.0** · 许可证：[CC BY-NC 4.0](LICENSE)
+当前版本：**v2.4.2** · 许可证：[CC BY-NC 4.0](https://github.com/jackcheng459/ai-legal-case-workflow/blob/main/LICENSE)
 
 ## 关于作者与合作
 
@@ -85,7 +85,7 @@
 
 ## 版本迭代
 
-开发侧“技能版本存档”目录保留 v1.0.0 至 v2.4.0 八个版本序列，并单独保存 v2.2.1 修订前源包及 v2.3.0 评审过程包。公开仓库当前以 **v2.4.0** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
+开发侧“技能版本存档”目录保留 v1.0.0 至 v2.4.2 的版本序列，并单独保存 v2.2.1 修订前源包及 v2.3.0 评审过程包。公开仓库当前以 **v2.4.2** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
 
 | 版本 | 主要变化 | 定位 |
 |---|---|---|
@@ -97,6 +97,8 @@
 | v2.3.0 | 按 TRACE 评测反馈实施渐进式披露；入口 `SKILL.md` 从 819 行缩减为 186 行，详细流程迁移到五个按需加载模块；补强输入输出契约、工具真实状态和安全重试边界 | 模块化架构升级，七阶段能力保持不变 |
 | v2.3.1 | 根据 V2.3.0 评审关闭合并门禁：修复代理立场路由、法源标注、工具授权、PDF 降级、民事一审适用范围和外部等待态；入口 `SKILL.md` 调整为 209 行 | 向后兼容的补丁版本，不新增阶段 |
 | v2.4.0 | 完成 G1 法律规则校准：补强诉讼时效、举证期限、请求权与利息、个人信息、股东责任、法定期限、保全、质量异议、诉讼费、证据目录、庭审笔录和法院交付规则；增加专门领域识别闸门 | 法律准确性与程序风险控制版本，仍保持民事一审七阶段范围 |
+| v2.4.1 | 使用符合 SkillHub 文件要求的专用包完成平台分发；技能逻辑和仓库源码与 v2.4.0 一致 | SkillHub 分发序号，无源码功能变更 |
+| v2.4.2 | 优化 `SKILL.md` 首屏的作者、适用对象、七阶段用户视图、核心能力和使用边界；同步 README、CHANGELOG、FAQ 与许可证指向 | 面向 SkillHub 展示和上手体验的内容补丁，不改变功能逻辑 |
 
 历史 ZIP 用于追溯原始版本，不直接作为当前安装包。使用时请以仓库当前文件和变更记录为准。
 
@@ -161,6 +163,10 @@ git clone https://github.com/jackcheng459/ai-legal-case-workflow.git
 ### 方式二：下载 ZIP
 
 在 GitHub 仓库页面选择 `Code`，下载 ZIP 后解压到目标技能目录。
+
+### SkillHub 专用包
+
+SkillHub 专用包有意保留 `README.md`、数据安全说明和贡献指南，方便下载后查看项目定位、核心能力与作者信息。因平台不接受公众号和个人微信二维码文件，专用包不包含 `assets/`，其中的 README 以公众号名称、微信号和社交平台文字链接替代二维码区域。GitHub README 与完整版本包继续保留二维码。根据平台文件要求，SkillHub 专用包也不附带 `LICENSE` 和 `NOTICE.md`；完整许可文本和版权边界以 GitHub 仓库的在线文件为准。
 
 ## 快速使用
 
@@ -250,10 +256,10 @@ output_formats: ["md"]
 
 ## 版本记录
 
-当前版本为 **v2.4.0**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
+当前版本为 **v2.4.2**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
 
 ## 许可证
 
-除另有注明外，本仓库采用 [Creative Commons Attribution-NonCommercial 4.0 International](LICENSE) 许可：允许在署名、标注修改并保持非商业用途的前提下复制、分享和改编。
+除另有注明外，本仓库采用 [Creative Commons Attribution-NonCommercial 4.0 International](https://github.com/jackcheng459/ai-legal-case-workflow/blob/main/LICENSE) 许可：允许在署名、标注修改并保持非商业用途的前提下复制、分享和改编。
 
-CC BY-NC 4.0 不允许以商业利益或金钱报酬为主要目的使用。商业培训、付费产品集成及其他商业用途需要另行取得书面授权。姓名、肖像、二维码、账号标识、律所名称和第三方材料的边界见 [NOTICE.md](NOTICE.md)。
+CC BY-NC 4.0 不允许以商业利益或金钱报酬为主要目的使用。商业培训、付费产品集成及其他商业用途需要另行取得书面授权。姓名、肖像、二维码、账号标识、律所名称和第三方材料的边界见 GitHub 仓库的 [NOTICE.md](https://github.com/jackcheng459/ai-legal-case-workflow/blob/main/NOTICE.md)。
