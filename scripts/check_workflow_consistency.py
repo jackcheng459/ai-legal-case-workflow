@@ -23,20 +23,51 @@ REQUIRED_REFERENCES = {
     "usage-and-faq.md",
 }
 SCENARIO_INVARIANTS = {
-    "T1": ("上诉理由链", "结果影响"),
-    "T2": ("waiting_external", "不假想对方理由"),
-    "T3": ("双轨", "交叉一致性"),
-    "T4": ("小额诉讼", "生成普通上诉状"),
-    "T5": ("原审未提交原因", "逾期风险"),
-    "T6": ("三类可上诉裁定", "扩展为全部裁定救济"),
-    "T7": ("遗漏请求", "承诺发回重审"),
-    "T8": ("无中国境内住所", "三十日期间"),
+    "T1": {"route": ("A0–A4",), "required": ("结果影响", "闭环"), "forbidden": "只写“原判错误”"},
+    "T2": {"route": ("A0–A5",), "required": ("逐项回应",), "forbidden": "未收到上诉状即假想理由"},
+    "T3": {"route": ("双轨", "A0–A6"), "required": ("交叉一致性",), "forbidden": "合并成单一上诉轨道"},
+    "T4": {"route": ("A0 阻断",), "required": ("一审终审",), "forbidden": "生成普通上诉状"},
+    "T5": {"route": ("A3",), "required": ("未提交原因", "逾期风险"), "forbidden": "自动称为有效新证据"},
+    "T6": {"route": ("受控 A0–A4",), "required": ("十日期限", "费用"), "forbidden": "扩展为全部裁定救济"},
+    "T7": {"route": ("A1–A3",), "required": ("区分不同处理规则",), "forbidden": "直接承诺发回重审"},
+    "T8": {"route": ("A0 + 专项闸门",), "required": ("三十日期间", "送达专项核验"), "forbidden": "套用境内十五日或十日结论"},
 }
 
 
 def require(condition: bool, message: str, errors: list[str]) -> None:
     if not condition:
         errors.append(message)
+
+
+def parse_scenario_rows(text: str) -> dict[str, dict[str, str]]:
+    """Parse T1-T8 from the five-column acceptance table."""
+    rows: dict[str, dict[str, str]] = {}
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not re.match(r"^\| T\d+ \|", stripped):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) != 5:
+            continue
+        scenario_id, scenario, route, required, forbidden = cells
+        rows[scenario_id] = {
+            "scenario": scenario,
+            "route": route,
+            "required": required,
+            "forbidden": forbidden,
+        }
+    return rows
+
+
+def extract_h2_section(text: str, heading: str) -> str:
+    """Return one level-two Markdown section without later sections."""
+    marker = f"## {heading}"
+    start = text.find(marker)
+    if start < 0:
+        return ""
+    section = text[start + len(marker):]
+    next_heading = re.search(r"\n## ", section)
+    return section[: next_heading.start()] if next_heading else section
 
 
 def main() -> int:
@@ -84,10 +115,29 @@ def main() -> int:
         require(f"references/{name}" in skill, f"SKILL.md loading table does not consume references/{name}", errors)
 
     appeal_examples = (references_dir / "appeal-case-examples.md").read_text(encoding="utf-8")
-    for scenario, markers in SCENARIO_INVARIANTS.items():
-        require(scenario in appeal_examples, f"appeal scenario {scenario} missing", errors)
-        for marker in markers:
-            require(marker in appeal_examples, f"appeal scenario {scenario} invariant missing: {marker}", errors)
+    scenario_rows = parse_scenario_rows(appeal_examples)
+    for scenario, expected in SCENARIO_INVARIANTS.items():
+        require(scenario in scenario_rows, f"appeal scenario {scenario} missing from acceptance table", errors)
+        if scenario not in scenario_rows:
+            continue
+        row = scenario_rows[scenario]
+        for column in ("route", "required"):
+            for marker in expected[column]:
+                require(
+                    marker in row[column],
+                    f"appeal scenario {scenario} {column} invariant missing: {marker}",
+                    errors,
+                )
+        require(
+            row["forbidden"] == expected["forbidden"],
+            f"appeal scenario {scenario} forbidden behavior mismatch: {row['forbidden']}",
+            errors,
+        )
+
+    failure_example = extract_h2_section(appeal_examples, "示例六：工具失败后的降级与恢复")
+    require(bool(failure_example), "second-instance failure receipt example missing", errors)
+    for marker in ("attempts:", "degraded_method:", "resume_from:", "completion_blocker:"):
+        require(marker in failure_example, f"second-instance failure receipt missing: {marker}", errors)
 
     combined = "\n".join(path.read_text(encoding="utf-8") for path in root.rglob("*.md") if ".git" not in path.parts)
     require("——" not in combined, "prohibited double em dash found in Markdown", errors)

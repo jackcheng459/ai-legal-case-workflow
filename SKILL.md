@@ -119,7 +119,7 @@ output_formats: [md]
 | `end_stage` | int | 默认 7，范围 1–7 |
 | `case_stage` | enum | `pre_litigation`、`subject_check`、`filing`、`defense`、`counterclaim`、`trial`、`post_trial`、`delivery`；仅在未给 `start_stage` 时推定 |
 
-`case_stage` 映射：`pre_litigation`→1，`subject_check`→2，`filing` 结合 `role` 映射为原告阶段3或被告阶段4，`defense/counterclaim`→4，`trial`→6，`post_trial`→6C，`delivery`→7。
+`case_stage` 映射：`pre_litigation`→1，`subject_check`→2，`filing` 结合 `role` 映射为原告阶段3或被告阶段4，`defense/counterclaim`→4，`trial`→6，`post_trial`→`start_stage=6` 并从 `references/stages-6-7-delivery.md` 的 6C 庭后子步骤切入，`delivery`→7。
 
 ### 二审条件输入
 

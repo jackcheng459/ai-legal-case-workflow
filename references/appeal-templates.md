@@ -28,7 +28,7 @@ appeal_tracks:
     party: <当事人>
     appeal_role: appellant | appellee
 decision_type: judgment | ruling
-phase_range: A0-A4
+phase_range: <A0-A6 中的实际执行范围>
 run_status: in_progress | completed | partial | blocked | waiting_external
 materials_snapshot: <目录、文件数量、校验时间或版本>
 legal_source_status: verified | partial | unverified
@@ -42,6 +42,8 @@ next_action: <下一动作、责任人和截止时间>
 状态首页之后必须附“材料范围与不可读文件”“本次完成范围”“未核实事项”“律师裁决点”。
 
 ## 模板1 A0 入口、期限与费用核验表
+
+参数映射：原审裁判优先取 `decision_path`，送达事实取 `service_records`，本方和对方上诉状态分别取 `client_filed_appeal`、`other_party_filed_appeal`，多方轨道写入 `appeal_tracks`，费用状态写入 `appeal_fee_status`。参数未提供时从 `materials_path` 识别并标明证据定位，不得根据空值推定事实。
 
 ### 1.1 可上诉性核验
 
@@ -70,11 +72,11 @@ next_action: <下一动作、责任人和截止时间>
 
 | 项目 | 当前事实 | 证据定位 | 状态 | 下一动作 |
 |---|---|---|---|---|
-| 上诉状是否书面提交 |  |  |  |  |
+| 本方是否已提交上诉（`client_filed_appeal`） |  |  |  |  |
 | 提交法院与时间 |  |  |  |  |
-| 对方是否上诉 |  |  |  |  |
+| 对方是否已上诉（`other_party_filed_appeal`） |  |  |  |  |
 | 上诉状副本送达 |  |  |  |  |
-| 上诉费计费基础 |  |  |  |  |
+| 费用状态（`appeal_fee_status`）与计费基础 |  |  |  |  |
 | 预交通知与截止日 |  |  |  |  |
 | 缴费凭证 |  |  |  |  |
 
@@ -248,7 +250,7 @@ downstream_documents:
 # 民事上诉状（裁定上诉）
 
 上诉人：<身份信息>
-被上诉人：<身份信息>
+被上诉人：<仅在原审裁判或法院要求存在其他当事人时列明；普通不予受理裁定未列其他当事人的，不得凭空补列>
 原审案号及裁定类型：<原件核对>
 
 ## 上诉请求

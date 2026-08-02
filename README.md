@@ -130,6 +130,9 @@
 
 ```text
 ai-legal-case-workflow/
+├── .github/
+│   └── workflows/
+│       └── validate-markdown.yml
 ├── SKILL.md
 ├── README.md
 ├── CHANGELOG.md
@@ -140,6 +143,9 @@ ai-legal-case-workflow/
 ├── assets/
 │   ├── chenglv-jinhualun-qrcode.png
 │   └── wechat-qrcode.png
+├── scripts/
+│   ├── check_markdown_links.py
+│   └── check_workflow_consistency.py
 └── references/
     ├── appeal-workflow.md
     ├── appeal-templates.md

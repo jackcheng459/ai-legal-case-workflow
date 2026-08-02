@@ -183,6 +183,30 @@ lawyer_review_required: true
 
 如果材料改为保全裁定、先予执行裁定或其他裁定，流程必须停止套用该模板，改为专项核验相应复议、复核或其他救济规则。
 
+## 示例六：工具失败后的降级与恢复
+
+虚构案件在 A1 读取一份扫描版庭审笔录时，OCR 工具连续失败两次。流程不得把未读取文件标成已完成，也不得从 A0 重新开始：
+
+```yaml
+run_status: partial
+failed_step: A1-原审庭审笔录读取
+attempts:
+  - method: primary_ocr
+    result: timeout
+  - method: primary_ocr_retry
+    result: timeout
+degraded_method: 提取可读页面并把不可读页列入材料缺口
+completed_outputs:
+  - 原审请求与主文对照表
+pending_outputs:
+  - 庭审陈述与程序事件核验
+resume_from: A1-庭审笔录读取
+completion_blocker: 不可读页面尚未完成视觉核对或取得清晰副本
+lawyer_review_required: true
+```
+
+工具恢复或取得清晰副本后，从 `resume_from` 继续，并回写受该笔录影响的事实、证据和程序结论；不得仅把 `run_status` 改为 `completed`。
+
 ## 八类场景验收表
 
 | 编号 | 场景 | 预期路由 | 必须出现的行为 | 禁止行为 |
