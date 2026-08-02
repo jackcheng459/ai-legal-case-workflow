@@ -11,3 +11,4 @@ venv/
 case-data/
 cases/
 outputs/
+.spec-workflow/
