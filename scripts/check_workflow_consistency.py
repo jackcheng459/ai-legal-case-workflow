@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 
-CURRENT_VERSION = "v2.5.0"
+CURRENT_VERSION = "v2.5.1"
 REQUIRED_REFERENCES = {
     "appeal-workflow.md",
     "appeal-templates.md",
