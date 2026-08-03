@@ -2,7 +2,7 @@
 
 > AI Legal Case Workflow
 
-当前版本：**v2.5.0** · 许可证：[CC BY-NC 4.0](https://github.com/jackcheng459/ai-legal-case-workflow/blob/main/LICENSE)
+当前版本：**v2.5.1** · 许可证：[CC BY-NC 4.0](https://github.com/jackcheng459/ai-legal-case-workflow/blob/main/LICENSE)
 
 ## 关于作者与合作
 
@@ -105,7 +105,7 @@
 
 ## 版本迭代
 
-开发侧“技能版本存档”目录保留 v1.0.0 至 v2.5.0 的版本序列，并单独保存重要评审、裁决和验证过程文件。公开仓库当前以 **v2.5.0** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
+开发侧“技能版本存档”目录保留 v1.0.0 至 v2.5.1 的版本序列，并单独保存重要评审、裁决和验证过程文件。公开仓库当前以 **v2.5.1** 为准，版本号不写入 `SKILL.md` frontmatter，统一通过 README 与 [CHANGELOG.md](CHANGELOG.md) 记录。
 
 | 版本 | 主要变化 | 定位 |
 |---|---|---|
@@ -121,6 +121,7 @@
 | v2.4.2 | 优化 `SKILL.md` 首屏的作者、适用对象、七阶段用户视图、核心能力和使用边界；同步 README、CHANGELOG、FAQ 与许可证指向 | 面向 SkillHub 展示和上手体验的内容补丁，不改变功能逻辑 |
 | v2.4.3 | 根据 TRACE 评测补充完整虚构输出样例、统一运行状态、失败回执和恢复协议；收紧格式转换和降级完成状态 | 文档质量与运行可靠性补丁，不改变民事一审七阶段范围 |
 | v2.5.0 | 新增民事二审 A0–A6 专门路径、独立上诉轨道、判决错误审计、二审模板与 D0–D6 质量门；裁定上诉限于三类受控裁定 | 从民事一审扩展到民事一审与二审双程序路径 |
+| v2.5.1 | 适度增强 `SKILL.md` 的首屏摘要，前置作者来源、目标用户、双程序路径、核心任务与典型产出，同时保留触发词、负向边界和律师终审要求 | WorkBuddy 展示适配补丁，不改变功能与法律规则 |
 
 历史 ZIP 用于追溯原始版本，不直接作为当前安装包。使用时请以仓库当前文件和变更记录为准。
 
@@ -314,7 +315,7 @@ output_formats: ["md"]
 
 ## 版本记录
 
-当前版本为 **v2.5.0**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
+当前版本为 **v2.5.1**。历史版本与仓库级修订统一记录在 [CHANGELOG.md](CHANGELOG.md)，不写入 `SKILL.md` frontmatter。
 
 ## 许可证
 
