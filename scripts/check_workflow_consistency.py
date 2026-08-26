@@ -39,6 +39,9 @@ SCENARIO_INVARIANTS = {
     "T14": {"route": ("A0–A6",), "required": ("法源版本", "现行原文", "效力"), "forbidden": "用旧版条文冒充现行法"},
     "T15": {"route": ("A1–A6",), "required": ("全文冲突扫描", "虚假完成"), "forbidden": "有关键冲突仍称全部已核验"},
     "T16": {"route": ("A4/A6",), "required": ("源文件冻结", "文本等价", "视觉验证"), "forbidden": "只验证文件能打开"},
+    "T17": {"route": ("A5", "waiting_external"), "required": ("裁判入口证据", "产出类型分离"), "forbidden": "无可核验裁判仍进入 A6"},
+    "T18": {"route": ("A5", "hearing_live"), "required": ("必要分析在前", "总结性结论在后"), "forbidden": "先给结论再补分析"},
+    "T19": {"route": ("A5",), "required": ("记录来源分层", "单一庭审偏差与待办记录", "律师复核"), "forbidden": "把律师笔记当正式笔录或自动认定立场变化的法律效果"},
 }
 
 
@@ -48,7 +51,7 @@ def require(condition: bool, message: str, errors: list[str]) -> None:
 
 
 def parse_scenario_rows(text: str) -> dict[str, dict[str, str]]:
-    """Parse T1-T16 from the five-column acceptance table."""
+    """Parse T1-T19 from the five-column acceptance table."""
     rows: dict[str, dict[str, str]] = {}
     for line in text.splitlines():
         stripped = line.strip()
@@ -137,6 +140,14 @@ def main() -> int:
         ("expanded_or_more_complete_copy", appeal_workflow, "appeal-workflow.md"),
         ("critical_fact_conflicts", appeal_quality, "appeal-quality-checklist.md"),
         ("规范化文本", tooling, "tooling-and-fallbacks.md"),
+        ("hearing_context: live", appeal_workflow, "appeal-workflow.md"),
+        ("record_status: lawyer_notes", appeal_workflow, "appeal-workflow.md"),
+        ("second_instance_decision_path", appeal_workflow, "appeal-workflow.md"),
+        ("decision_event", appeal_workflow, "appeal-workflow.md"),
+        ("artifact_type", appeal_workflow, "appeal-workflow.md"),
+        ("庭审偏差与待办记录", appeal_workflow, "appeal-workflow.md"),
+        ("材料与限制 → 必要分析 → 总结性结论", appeal_templates, "appeal-templates.md"),
+        ("没有可核验二审裁判却进入 A6", appeal_quality, "appeal-quality-checklist.md"),
     ):
         require(marker in text, f"V2.6.0 regression marker missing from {source}: {marker}", errors)
     fact_table_header = "| issue_id | fact_id | source_role | 命题或原文 | 材料与页码 | event_time | fact_status | 反向材料 | 下游文书 |"
@@ -148,6 +159,12 @@ def main() -> int:
     require(
         "assertion_id" not in appeal_templates,
         "appeal-templates.md still contains deprecated assertion_id",
+        errors,
+    )
+    hearing_delta_header = "| 事件或变化 | 现场来源 | 与庭前底稿的差异 | 对当前争点的影响 | 是否需律师确认 | 庭后动作 |"
+    require(
+        hearing_delta_header in appeal_templates,
+        "appeal-templates.md must use one lightweight hearing delta and action table",
         errors,
     )
     scenario_rows = parse_scenario_rows(appeal_examples)
@@ -182,7 +199,7 @@ def main() -> int:
         return report(errors)
     print(
         f"PASS: workflow consistency, {CURRENT_VERSION}, "
-        f"SKILL.md {line_count} lines/{char_count} characters, T1-T16 present"
+        f"SKILL.md {line_count} lines/{char_count} characters, T1-T19 present"
     )
     return 0
 

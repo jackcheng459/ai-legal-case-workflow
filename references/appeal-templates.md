@@ -332,10 +332,32 @@ correction_cascade:
 | evidence_id | 原审提交/质证状态 | 同一性与范围差异 | 真实性 | 关联性 | 合法性 | 证明目的 | 逾期理由 | 现行法核验 | 回应材料 |
 |---|---|---|---|---|---|---|---|---|---|
 
-### 当庭记录
+### 庭中限时响应块（仅 `hearing_context: live`）
 
-| 时间或议题 | 法院问题 | 各方回答 | 证据处理 | 待补事项 | 截止日 |
+```yaml
+phase_id: A5
+artifact_type: hearing_live_response
+hearing_context: live
+time_budget_minutes: <正整数>
+current_question: <本次需处理的问题>
+record_status: lawyer_notes | court_record_pending | court_record_verified | court_record_unavailable
+```
+
+按“材料与限制 → 必要分析 → 总结性结论 → 可当庭使用要点 → 程序请求/异议/保留意见 → 证据定位与禁止确定表述事项”的顺序输出。完整法律意见留到庭后补充核验，不得用未核实内容换取即时结论。
+
+### 庭审偏差与待办记录（出现变化时使用）
+
+| 事件或变化 | 现场来源 | 与庭前底稿的差异 | 对当前争点的影响 | 是否需律师确认 | 庭后动作 |
 |---|---|---|---|---|---|
+
+可在“事件或变化”中标注 `issue_change`、`new_evidence`、`new_statement`、`position_tension`、`court_request`、`deadline` 或 `mediation_change`。`position_tension` 只触发律师复核，不自动认定自认、放弃、变更请求或越权代理。
+
+### 庭审记录状态
+
+| record_status | 当前来源与定位 | 可否作为法院确认内容 | 核验日期与方式 | 待核或更正事项 |
+|---|---|---|---|---|
+
+仅在 `court_record_verified` 时填写正式笔录的核验日期和方式。正式笔录尚未取得或客观上无法取得时，如实使用 `court_record_pending` 或 `court_record_unavailable`，不要求当庭拍照或复制。
 
 ## 模板11 A5 调解授权与庭后补强
 
@@ -360,6 +382,16 @@ correction_cascade:
 5. 与上诉或答辩请求一致的结论。
 
 ## 模板12 A6 裁判对比与交付报告
+
+### 12.0 A6 入口证据
+
+```yaml
+phase_id: A6
+second_instance_decision_path: <可读取的二审裁判路径；无则为 none>
+decision_event: <法院通知或送达事件及原始载体定位；无则为 none>
+```
+
+`second_instance_decision_path` 与可核验 `decision_event` 均为 `none` 时停止使用本模板。原审裁判的 `decision_path` 不能替代；此时保持 `phase_id: A5`、`run_status: waiting_external`、`waiting_for: 二审裁判`。
 
 ### 12.1 裁判对比
 

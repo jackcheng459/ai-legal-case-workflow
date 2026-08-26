@@ -142,8 +142,14 @@ output_formats: [md]
 | `appeal_tracks` | list | 已存在的多方上诉轨道；没有时由 A0 建立 |
 | `appeal_fee_status` | enum | `unknown`、`notified`、`paid`、`overdue_risk` 或 `not_applicable` |
 | `second_instance_stage` | enum | `pre_filing`、`filed`、`responding`、`hearing`、`post_hearing`、`decided`、`delivery`；仅在未给 `start_phase` 时推定 |
+| `hearing_context` | enum | `normal` 或 `live`；仅在正在庭审且时间受限时启用 `live` |
+| `time_budget_minutes` | int | 庭中可用分钟数；只控制分析深度和呈现长度 |
+| `current_question` | string | 庭中需要即时处理的具体问题 |
+| `record_status` | enum | `lawyer_notes`、`court_record_pending`、`court_record_verified` 或 `court_record_unavailable` |
+| `second_instance_decision_path` | string | 二审裁判文书路径；仅用于 A6 入口 |
+| `decision_event` | object | 二审裁判通知或送达及原始载体定位；没有裁判文书时使用 |
 
-`second_instance_stage` 映射：`pre_filing/filed/responding`→A0，`hearing/post_hearing`→A5，`decided/delivery`→A6。后两类从中途切入时仍须快速执行 A0 入口核验和 A1 底座完整性检查，不能跳过期限与裁判身份确认。
+`second_instance_stage` 映射：`pre_filing/filed/responding`→A0，`hearing/post_hearing`→A5，`decided/delivery`→A6。A6 还须有 `second_instance_decision_path` 或可核验 `decision_event`；原审 `decision_path` 不能替代。仅已开庭、待判或只有律师记录时保持 A5 和 `waiting_external`。从中途切入时仍须快速执行 A0 入口核验和 A1 底座完整性检查。
 
 裁定上诉仅覆盖不予受理、管辖权异议和驳回起诉三类通常可上诉裁定；其他裁定或特别救济进入专项核验闸门。
 
