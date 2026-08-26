@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 
-CURRENT_VERSION = "v2.5.1"
+CURRENT_VERSION = "v2.6.0"
 REQUIRED_REFERENCES = {
     "appeal-workflow.md",
     "appeal-templates.md",
@@ -31,6 +31,14 @@ SCENARIO_INVARIANTS = {
     "T6": {"route": ("受控 A0–A4",), "required": ("十日期限", "费用"), "forbidden": "扩展为全部裁定救济"},
     "T7": {"route": ("A1–A3",), "required": ("区分不同处理规则",), "forbidden": "直接承诺发回重审"},
     "T8": {"route": ("A0 + 专项闸门",), "required": ("三十日期间", "送达专项核验"), "forbidden": "套用境内十五日或十日结论"},
+    "T9": {"route": ("A1–A5",), "required": ("来源角色", "原文定位", "核验状态"), "forbidden": "把诉辩主张写成法院认定"},
+    "T10": {"route": ("A1–A5",), "required": ("统计截止时间", "公式", "来源"), "forbidden": "只因数字相同就跨时点复用"},
+    "T11": {"route": ("A1–A6",), "required": ("更正传播", "过期版本"), "forbidden": "只修改当前文书"},
+    "T12": {"route": ("A4",), "required": ("权威基准", "人工修改"), "forbidden": "退回较早 AI 草稿覆盖律师版本"},
+    "T13": {"route": ("A3–A5",), "required": ("原审状态", "同一性", "范围差异", "现行法"), "forbidden": "整组材料贴单一新证据标签"},
+    "T14": {"route": ("A0–A6",), "required": ("法源版本", "现行原文", "效力"), "forbidden": "用旧版条文冒充现行法"},
+    "T15": {"route": ("A1–A6",), "required": ("全文冲突扫描", "虚假完成"), "forbidden": "有关键冲突仍称全部已核验"},
+    "T16": {"route": ("A4/A6",), "required": ("源文件冻结", "文本等价", "视觉验证"), "forbidden": "只验证文件能打开"},
 }
 
 
@@ -40,7 +48,7 @@ def require(condition: bool, message: str, errors: list[str]) -> None:
 
 
 def parse_scenario_rows(text: str) -> dict[str, dict[str, str]]:
-    """Parse T1-T8 from the five-column acceptance table."""
+    """Parse T1-T16 from the five-column acceptance table."""
     rows: dict[str, dict[str, str]] = {}
     for line in text.splitlines():
         stripped = line.strip()
@@ -97,7 +105,9 @@ def main() -> int:
         require(not re.search(r"^version:", fm, re.MULTILINE), "version must not appear in frontmatter", errors)
 
     line_count = len(skill.splitlines())
-    require(line_count <= 500, f"SKILL.md has {line_count} lines; expected at most 500", errors)
+    char_count = len(skill)
+    require(line_count <= 300, f"SKILL.md has {line_count} lines; V2.6.0 budget is at most 300", errors)
+    require(char_count <= 10623, f"SKILL.md has {char_count} characters; V2.6.0 budget is at most 10623", errors)
 
     for version_file, text in (("README.md", readme), ("CHANGELOG.md", changelog), ("usage-and-faq.md", faq)):
         require(CURRENT_VERSION in text, f"{version_file} does not mention {CURRENT_VERSION}", errors)
@@ -107,6 +117,8 @@ def main() -> int:
     require("start_stage" in skill and "end_stage" in skill, "first-instance stage parameters missing", errors)
     require("start_phase" in skill and "end_phase" in skill, "second-instance phase parameters missing", errors)
     require("A0" in skill and "A6" in skill, "second-instance A0-A6 route incomplete", errors)
+    for marker in ("fact_id", "source_role", "authoritative_base_path", "correction_cascade"):
+        require(marker in skill, f"V2.6.0 hard-gate marker missing from SKILL.md: {marker}", errors)
 
     references_dir = root / "references"
     missing_refs = sorted(name for name in REQUIRED_REFERENCES if not (references_dir / name).is_file())
@@ -115,6 +127,29 @@ def main() -> int:
         require(f"references/{name}" in skill, f"SKILL.md loading table does not consume references/{name}", errors)
 
     appeal_examples = (references_dir / "appeal-case-examples.md").read_text(encoding="utf-8")
+    appeal_workflow = (references_dir / "appeal-workflow.md").read_text(encoding="utf-8")
+    appeal_templates = (references_dir / "appeal-templates.md").read_text(encoding="utf-8")
+    appeal_quality = (references_dir / "appeal-quality-checklist.md").read_text(encoding="utf-8")
+    tooling = (references_dir / "tooling-and-fallbacks.md").read_text(encoding="utf-8")
+    for marker, text, source in (
+        ("snapshot_cutoff", appeal_templates, "appeal-templates.md"),
+        ("submission_status", appeal_templates, "appeal-templates.md"),
+        ("expanded_or_more_complete_copy", appeal_workflow, "appeal-workflow.md"),
+        ("critical_fact_conflicts", appeal_quality, "appeal-quality-checklist.md"),
+        ("规范化文本", tooling, "tooling-and-fallbacks.md"),
+    ):
+        require(marker in text, f"V2.6.0 regression marker missing from {source}: {marker}", errors)
+    fact_table_header = "| issue_id | fact_id | source_role | 命题或原文 | 材料与页码 | event_time | fact_status | 反向材料 | 下游文书 |"
+    require(
+        fact_table_header in appeal_templates,
+        "appeal-templates.md A1 fact table must use fact_id in its fixed header",
+        errors,
+    )
+    require(
+        "assertion_id" not in appeal_templates,
+        "appeal-templates.md still contains deprecated assertion_id",
+        errors,
+    )
     scenario_rows = parse_scenario_rows(appeal_examples)
     for scenario, expected in SCENARIO_INVARIANTS.items():
         require(scenario in scenario_rows, f"appeal scenario {scenario} missing from acceptance table", errors)
@@ -145,7 +180,10 @@ def main() -> int:
 
     if errors:
         return report(errors)
-    print(f"PASS: workflow consistency, {CURRENT_VERSION}, SKILL.md {line_count} lines, T1-T8 present")
+    print(
+        f"PASS: workflow consistency, {CURRENT_VERSION}, "
+        f"SKILL.md {line_count} lines/{char_count} characters, T1-T16 present"
+    )
     return 0
 
 

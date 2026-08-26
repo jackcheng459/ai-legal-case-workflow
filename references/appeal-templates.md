@@ -31,11 +31,14 @@ decision_type: judgment | ruling
 phase_range: <A0-A6 中的实际执行范围>
 run_status: in_progress | completed | partial | blocked | waiting_external
 materials_snapshot: <目录、文件数量、校验时间或版本>
+authoritative_base_path: <律师或用户指定基准；没有则为 none>
 legal_source_status: verified | partial | unverified
 lawyer_review_status: pending | reviewed | finalized
 specialist_review_required: false
 specialist_domains: []
 unverified_items: []
+critical_fact_conflicts: []
+stale_preserved_files: []
 next_action: <下一动作、责任人和截止时间>
 ```
 
@@ -96,15 +99,29 @@ next_action: <下一动作、责任人和截止时间>
 
 ### 2.2 争点、认定与证据
 
-| issue_id | 原审争点 | 当事人主张 | 法院认定原文 | finding_id | 采用证据 | 未采证据与理由 | 待核问题 |
-|---|---|---|---|---|---|---|---|
+先记录来源命题，不在同一单元格中把主张、认定和推论合并：
 
-### 2.3 法律适用
+| issue_id | fact_id | source_role | 命题或原文 | 材料与页码 | event_time | fact_status | 反向材料 | 下游文书 |
+|---|---|---|---|---|---|---|---|---|
+
+`source_role` 使用 `original_document`、`party_assertion`、`court_finding`、`court_recorded_undisputed`、`analysis_inference` 或 `lawyer_decision`。`fact_status` 使用 `verified`、`disputed`、`pending`、`superseded`。仅有 `party_assertion` 的命题不得改写为 `court_finding`。
+
+再单列法院认定：
+
+| finding_id | issue_id | 法院认定原文与页码 | 采用证据 | 未采证据与理由 | 与各方主张差异 | 待核问题 |
+|---|---|---|---|---|---|---|
+
+### 2.3 关键金额与时点
+
+| amount_id | 数值 | 事项 | event_time | snapshot_cutoff | 计算式 | 原始来源与页码 | fact_status |
+|---|---:|---|---|---|---|---|---|
+
+### 2.4 法律适用
 
 | issue_id | 请求权基础或程序问题 | 原审适用法源 | 原文核验状态 | 推理链 | 可能缺口 |
 |---|---|---|---|---|---|
 
-### 2.4 原审程序事件
+### 2.5 原审程序事件
 
 | 日期 | 程序事件 | 原始材料 | 对各方权利的影响 | 待核事项 |
 |---|---|---|---|---|
@@ -159,8 +176,10 @@ downstream_documents:
 
 ### 5.1 新增证据表
 
-| evidence_id | 名称 | 来源与取得时间 | 原审未提交原因 | 证明目的 | 关联争点 | 真实性核验 | 逾期风险 | 对方可能质证 |
-|---|---|---|---|---|---|---|---|---|
+| evidence_id | 名称 | 形成/取得时间 | 原审提交与质证状态 | 与原审材料同一性及范围差异 | submission_status | 原审未提交原因 | 证明目的 | 真实性核验 | 逾期风险 | 对方可能质证 |
+|---|---|---|---|---|---|---|---|---|---|---|
+
+`submission_status` 使用 `original_recorded`、`original_submitted_unverified`、`repeated_same_material`、`expanded_or_more_complete_copy`、`newly_formed`、`newly_obtained` 或 `unknown`。该字段描述材料事实状态，不直接等于现行法上的采纳结论。
 
 ### 5.2 证据缺口关闭计划
 
@@ -276,10 +295,24 @@ downstream_documents:
 
 ### 9.2 法源核验报告
 
-| 引用位置 | 法源名称与条款 | 权威来源 | 效力状态 | 核验日期 | 原文要点 | 适用边界 |
-|---|---|---|---|---|---|---|
+| 引用位置 | 法源全称 | 发布机关 | 修订版本与生效信息 | 条号 | 现行原文要点 | 权威来源 | 效力状态 | 核验日期 | 适用边界 |
+|---|---|---|---|---|---|---|---|---|---|
 
 法源无法核实时，不在文书中伪装为确定依据，统一标注 `【未经工具核实，仅供参考】` 并进入律师复核清单。
+
+### 9.3 权威基准与更正传播
+
+```yaml
+authoritative_base_path: <律师或用户指定文件；没有则为 none>
+authoritative_base_fingerprint: <可用时记录 SHA-256，否则记录版本和校验时间>
+correction_cascade:
+  corrected_items: []
+  updated_files: []
+  stale_preserved_files: []
+  unresolved_dependencies: []
+```
+
+有权威基准时先记录相对 AI 草稿的人工修改，再另存新版本。事实或法源更正后必须全文搜索依赖文件；旧版本可以保留，但须标记为 `superseded` 或列入 `stale_preserved_files`。
 
 ## 模板10 A5 庭审或询问提纲
 
@@ -296,8 +329,8 @@ downstream_documents:
 
 ### 新证据质证
 
-| evidence_id | 真实性 | 关联性 | 合法性 | 证明目的 | 逾期理由 | 回应材料 |
-|---|---|---|---|---|---|---|
+| evidence_id | 原审提交/质证状态 | 同一性与范围差异 | 真实性 | 关联性 | 合法性 | 证明目的 | 逾期理由 | 现行法核验 | 回应材料 |
+|---|---|---|---|---|---|---|---|---|---|
 
 ### 当庭记录
 
