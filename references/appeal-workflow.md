@@ -11,7 +11,7 @@
 - [A3 增量与程序](#a3-证据增量新请求与程序事项)
 - [A4 文书材料包](#a4-二审文书材料包)
 - [A5 庭审或询问](#a5-庭审询问调解与庭后补强)
-- [A6 裁判与交付](#a6-二审裁判交付与归档)
+- [A6 终局处理与交付](#a6-二审终局处理交付与归档)
 - [场景裁剪](#场景裁剪与外部等待)
 
 ## 通用边界与法律核验
@@ -104,7 +104,7 @@
 4. 逐项拆解法律适用：请求权基础、构成要件、解释方法、法条效力和裁判逻辑。
 5. 识别程序节点：管辖、送达、回避、举证、鉴定、证人、庭审组成、辩论权和遗漏当事人。
 6. 把当事人主张与法院认定分栏，禁止将未被采信的主张写成已认定事实。
-7. 为可能进入 A2–A6 的关键事实建立登记表：`fact_id`、事实命题、`source_role`、原文与页码、事件时间、统计截止时间、核验状态、反向材料和下游文书。来源角色至少区分 `original_document`、`party_assertion`、`court_finding`、`court_recorded_undisputed`、`analysis_inference`、`lawyer_decision`。
+7. 为可能进入 A2–A6 的关键事实建立登记表：`fact_id`、事实命题、`source_role`、`statement_actor`、原文与页码、事件时间、统计截止时间、核验状态、反向材料和下游文书。来源角色至少区分 `original_document`、`party_assertion`、`court_finding`、`court_recorded_undisputed`、`lawyer_observation`、`analysis_inference`、`lawyer_decision`。
 8. 金额不得脱离时点单独复用。同一数值在不同阶段出现时，分别记录事件发生日、统计截止日、计算式和对应载体；无法确认时保留独立待核项。
 
 ### 核心产出
@@ -200,8 +200,9 @@
 ### A5/A6 阶段门禁
 
 - 庭前准备、正在开庭或询问、当庭质证、庭审记录整理和裁判作出前的庭后补强均属于 A5。产出类型用 `artifact_type` 单独记录，不得因文件名含“庭后”“分析”或“质证”而改写 `phase_id`。
-- 进入 A6 必须有可读取的 `second_instance_decision_path`，或有能够回链法院通知、送达记录等原始载体的 `decision_event`。原审裁判使用的 `decision_path` 不能替代；只有律师记录、当事人口述、已开庭或“等待判决”均不能满足门禁。
-- 庭审结束但尚无可核验裁判时固定为 `second_instance_stage: post_hearing`、`phase_id: A5`、`run_status: waiting_external`、`waiting_for: 二审裁判`；不得生成以 A6 命名的裁判对比或交付报告。
+- 进入 A6 必须有可读取的 `second_instance_terminal_document_path`，或有能够回链法院通知、送达记录、法院系统页面等官方原始载体且 `verification_status: verified` 的 `terminal_event`。原审 `decision_path` 不能替代；律师记录、当事人口述、电话转述或普通即时通信信息不能满足门禁。
+- 只有已核验官方事件而没有终局文书全文时，可以进入 A6 的 `procedure_status_only` 范围，但 `run_status` 保持 `waiting_external`，只记录程序状态、载体、送达或取得动作和期限，不得生成裁判理由、实体结果或权利义务影响分析。
+- 庭审结束但尚无上述入口证据时固定为 `second_instance_stage: post_hearing`、`phase_id: A5`、`run_status: waiting_external`、`waiting_for: 二审终局文书或可核验官方事件`；不得生成 A6 文件。
 
 ### 审理方式预检
 
@@ -217,7 +218,7 @@
 
 ### 庭中限时模式
 
-只有用户明确表示正在开庭、正在询问或需要限时响应时，才启用 `hearing_context: live`。它是 A5 内的呈现与执行模式，不是新阶段，也不要求在现场重做全案。根据 `time_budget_minutes` 和 `current_question` 按下列顺序输出：
+只有用户明确处于实际庭审、法庭询问过程，或法院要求现场即时回应时，才启用 `hearing_context: live`。非现场的“尽快”“今天”“下班前”仍使用 `normal`。它是 A5 内的呈现与执行模式，不是新阶段，也不要求现场重做全案。根据 `time_budget_minutes` 和 `current_question` 按下列顺序输出：
 
 1. 说明当前可用材料、记录来源、任务边界和不能确认的事项。
 2. 先做与当前问题直接相关的必要分析，包括证明目的、真实性或证明力争议、与既有事实证据底座的矛盾、已核实法源和未决事项。
@@ -227,16 +228,17 @@
 6. 列明证据页码或其他定位，以及尚未核实、不得当庭确定表述的内容。
 7. 需要完整法律意见时，保留至庭后在材料和法源补充核验后生成。
 
-不得先给结论再补分析，也不得为追求即时性把未核法源、律师记忆或不完整记录包装为确定事实。
+未提供 `time_budget_minutes` 时，如现场允许只追问一次；否则标记 `unknown` 并输出最小但完整的分析，不以固定行数压缩。不得先给结论再补分析，也不得为追求即时性把未核法源、律师记忆或不完整记录包装为确定事实。
 
 ### 庭审偏差、记录来源与庭后动作
 
-- 仅在实际出现新证据、新陈述、争点变化、立场张力、法院要求、期限或调解条件变化时，维护一张“庭审偏差与待办记录”。它只记录相对庭前底稿的变化及庭后动作，不另建通用的突发事件、争点变化和立场变化三套台账。
+- `artifact_type` 只使用 `hearing_live_response`、`hearing_delta_log`、`post_hearing_action_list`、`post_hearing_opinion`、`terminal_status_receipt`、`terminal_analysis_report` 或 `delivery_archive`，用于区分产出，不改变 `phase_id`。
+- 仅在实际出现新证据、新陈述、争点变化、立场张力、法院要求、期限或调解条件变化时，维护一张 `artifact_type: hearing_delta_log` 的“庭审偏差与待办记录”。它只记录相对庭前底稿的变化及庭后动作，不另建通用的突发事件、争点变化和立场变化三套台账。
 - `position_tension` 只表示当庭表述与既有书面立场可能存在张力，必须标记 `lawyer_review_required=true`；未经完整语境、授权范围和法律效果核验，不得自动认定为自认、放弃、变更请求或越权代理。
-- `record_status: lawyer_notes` 表示仅有律师笔记、记忆或现场信息，可用于即时临时分析，但不得称为庭审笔录或法院确认内容。
-- `record_status: court_record_pending` 表示正式笔录尚未取得或尚未核对；法院允许并能够取得时再复核，不要求当庭拍照、复制或立即取得完整笔录。
-- `record_status: court_record_verified` 须记录核验日期、核验方式和需要更正的内容；客观上无法取得时使用 `court_record_unavailable`，同时保留现有记录来源及局限。
-- 当庭新情况先回写事实与证据底座，再按 `correction_cascade` 修改依赖文书并标记过期版本。庭后意见只回应已经出现的争点和法院要求，不借机无边界扩张请求。
+- `record_source` 记录当前信息载体，可为 `lawyer_notes`、`court_record`、`court_audio_video` 或 `other`；`court_record_status` 独立记录正式笔录处于 `not_obtained`、`obtained_pending_review`、`verified` 或 `unavailable`。二者不得压成单一状态，`lawyer_notes + not_obtained` 是合法组合。
+- 律师笔记回写 A1 事实表时使用 `source_role: lawyer_observation`，另以 `statement_actor` 标明法院、哪一方、证人或其他发言者，并保持 `fact_status: pending`，直至被原件或正式记录核验。不得因记录人是律师就把内容自动归为 `party_assertion`、`analysis_inference` 或法院确认。
+- 只有正式笔录核对完成后才使用 `court_record_status: verified` 并记录核验日期、方式及更正项；`court_recorded_undisputed` 仅用于笔录确实记载且无争议的内容，`court_finding` 仅来自裁判认定。法院允许并能够取得时再复核，不要求当庭拍照、复制或立即取得完整笔录。
+- 庭审偏差表中的庭后动作转入 `artifact_type: post_hearing_action_list`；含期限的事项同步更新 A0 期限总表。新情况先回写共用底座，再按 `correction_cascade` 更新依赖文书并标记过期版本，不重复建立同一待办。
 
 ### 撤回与和解分支
 
@@ -244,16 +246,16 @@
 - 一审裁判明显错误或当事人恶意串通损害他人利益等情形，撤回上诉可能不被准许，需按现行司法解释专项核验。
 - 二审调解书送达、撤回一审起诉、撤回上诉和当事人自行和解的程序效果不同，分别核验并记录，不用“双方和解”概括全部后果。
 
-## A6 二审裁判、交付与归档
+## A6 二审终局处理、交付与归档
 
-进入本阶段前再次核对 A5/A6 门禁；没有 `second_instance_decision_path` 或可核验 `decision_event` 时停止，并保持 A5 `waiting_external`。
+进入本阶段前再次核对 A5/A6 门禁。`terminal_event` 必须结构化记录 `carrier_type`、`source_locator`、`event_time`、`verification_status` 和 `content_scope`；缺少可读取终局文书和已核验官方事件时停止，并保持 A5 `waiting_external`。
 
-1. 对比原审主文、二审主文和裁判理由，标明维持、改判、撤销、变更、发回或程序处理。
-2. 核对二审裁判是否终审、费用负担、履行期限、保全衔接和文书送达。
-3. 以判决上诉一般自二审立案之日起三个月、裁定上诉一般三十日作为现行法检索锚点；判决审限延长核验《民事诉讼法》第一百八十三条，裁定审限延长核验现行《最高人民法院关于适用〈中华人民共和国民事诉讼法〉的解释》第三百三十九条。记录实际立案日、延长依据和当前状态，不得把法定审限等同于必然结案日期。
-4. 如发回重审，核对二审上诉费退还、原审诉讼费重新处理和新一审交接；同案已经发回重审后再次上诉的，专项核验不得再次发回的规则。
-5. 如涉及再审、执行或其他后续程序，只做边界提示并转入相应专项流程，不在本模块继续推演。
-6. 形成法院版、客户版和团队归档版，核验文件能否打开、目录是否完整、敏感信息是否按交付对象处理。
+1. 只有已核验官方事件但尚无全文时，使用 `artifact_type: terminal_status_receipt`、`output_scope: procedure_status_only` 和 `run_status: waiting_external`，仅记录当前程序状态、官方载体、送达或取得情况、期限与待办；禁止推断实体结果、裁判理由和权利义务影响。
+2. 取得完整终局文书后，使用 `output_scope: full_terminal_analysis`。判决或裁定逐项对比原审与二审主文、认定、理由、费用和后续影响；调解书核对约定义务、生效、履行保障、违约后果和费用；准许撤回上诉裁定核对程序终结、原审裁判状态及费用，不虚构实体再审理结论。`other_terminal_document` 只按可核实程序效果处理并交律师复核，`unknown` 在取得全文并识别类型前不得进入完整分析。
+3. 核对文书送达、生效或终审状态、履行期限、保全衔接和费用负担；任何期限进入 A0 期限总表。
+4. 以判决上诉一般自二审立案之日起三个月、裁定上诉一般三十日作为现行法检索锚点；记录实际立案日、延长依据和当前状态，不得把法定审限等同于必然结案日期。
+5. 发回重审时核对上诉费退还、原审诉讼费处理和新一审交接；再审、执行或其他后续程序只作边界提示并转专项流程。
+6. 形成与实际 `output_scope` 相符的客户版和团队归档版，核验文件可读、目录完整和敏感信息处理。
 
 ## 场景裁剪与外部等待
 
@@ -267,6 +269,8 @@
 | 其他裁定 | 不生成普通裁定上诉状，进入专项核验闸门 |
 | 对方上诉状尚未送达 | 不假想其理由，状态为 `waiting_external`；仅整理原审底座与风险预案 |
 | 二审已经开庭 | 从 A5 切入前快速补做 A0、A1 和现有上诉轨道一致性核对 |
+| 已核验终局通知但尚无文书全文 | A6 仅生成程序状态回执并等待全文，不分析实体结果 |
+| 调解书或准许撤回上诉裁定 | A6 按对应终局文书分支处理，不套用判决主文比较 |
 | 无中国境内住所或专项领域 | 标记 `specialist_review_required=true`，仅在专项核验后确认期限和程序结论 |
 
 阶段组完成时运行 `references/appeal-quality-checklist.md` 对应 D0–D6。固定结构从 `references/appeal-templates.md` 按需读取，不要一次加载全部模板。

@@ -142,14 +142,16 @@ output_formats: [md]
 | `appeal_tracks` | list | 已存在的多方上诉轨道；没有时由 A0 建立 |
 | `appeal_fee_status` | enum | `unknown`、`notified`、`paid`、`overdue_risk` 或 `not_applicable` |
 | `second_instance_stage` | enum | `pre_filing`、`filed`、`responding`、`hearing`、`post_hearing`、`decided`、`delivery`；仅在未给 `start_phase` 时推定 |
-| `hearing_context` | enum | `normal` 或 `live`；仅在正在庭审且时间受限时启用 `live` |
+| `hearing_context` | enum | `normal` 或 `live`；仅在实际庭审、询问或法院要求现场即时回应时启用 `live` |
 | `time_budget_minutes` | int | 庭中可用分钟数；只控制分析深度和呈现长度 |
 | `current_question` | string | 庭中需要即时处理的具体问题 |
-| `record_status` | enum | `lawyer_notes`、`court_record_pending`、`court_record_verified` 或 `court_record_unavailable` |
-| `second_instance_decision_path` | string | 二审裁判文书路径；仅用于 A6 入口 |
-| `decision_event` | object | 二审裁判通知或送达及原始载体定位；没有裁判文书时使用 |
+| `record_source` | enum | `lawyer_notes`、`court_record`、`court_audio_video` 或 `other` |
+| `court_record_status` | enum | `not_obtained`、`obtained_pending_review`、`verified` 或 `unavailable` |
+| `second_instance_terminal_document_path` | string | 二审终局文书路径；仅用于 A6 入口 |
+| `terminal_document_type` | enum | `judgment`、`ruling`、`mediation_statement`、`appeal_withdrawal_ruling`、`other_terminal_document` 或 `unknown` |
+| `terminal_event` | object | 无终局文书全文时，记录法院官方载体、定位、时间、核验状态和内容范围 |
 
-`second_instance_stage` 映射：`pre_filing/filed/responding`→A0，`hearing/post_hearing`→A5，`decided/delivery`→A6。A6 还须有 `second_instance_decision_path` 或可核验 `decision_event`；原审 `decision_path` 不能替代。仅已开庭、待判或只有律师记录时保持 A5 和 `waiting_external`。从中途切入时仍须快速执行 A0 入口核验和 A1 底座完整性检查。
+`second_instance_stage` 映射：`pre_filing/filed/responding`→A0，`hearing/post_hearing`→A5，`decided/delivery`→A6。A6 须有可读终局文书或能回链官方载体的已核验 `terminal_event`；仅有事件时限于程序状态输出并等待全文。原审 `decision_path`、律师记录或当事人口述不能替代。从中途切入时仍须快速执行 A0、A1 核验。
 
 裁定上诉仅覆盖不予受理、管辖权异议和驳回起诉三类通常可上诉裁定；其他裁定或特别救济进入专项核验闸门。
 
@@ -201,7 +203,7 @@ output_formats: [md]
 | A3 增量与程序 | 审查新证据、新请求、程序问题和调查需求 | 增量证据表、缺口关闭计划、程序申请清单 | D3 |
 | A4 文书材料包 | 形成上诉状、答辩状或裁定上诉材料 | 二审文书、证据目录、法源核验报告 | D4 |
 | A5 庭审或询问 | 准备审理范围、发问、质证、调解和庭后补强 | 庭审或询问提纲、质证意见、庭后意见 | D5 |
-| A6 裁判与交付 | 对比原审与二审裁判、告知后续边界并归档 | 裁判对比、客户报告、归档与交接清单 | D6 |
+| A6 终局处理与交付 | 按终局文书或已核验官方事件确定输出范围并归档 | 状态回执、终局文书分析、客户报告与交接清单 | D6 |
 
 详细步骤、裁定上诉边界和多上诉轨道见 `references/appeal-workflow.md`；固定结构见 `references/appeal-templates.md`；D0–D6 见 `references/appeal-quality-checklist.md`。
 

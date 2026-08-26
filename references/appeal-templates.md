@@ -16,7 +16,7 @@
 - [A4 证据与法源](#模板9-a4-二审证据目录与法源核验)
 - [A5 审理准备](#模板10-a5-庭审或询问提纲)
 - [A5 调解与庭后](#模板11-a5-调解授权与庭后补强)
-- [A6 交付](#模板12-a6-裁判对比与交付报告)
+- [A6 交付](#模板12-a6-终局处理与交付报告)
 
 ## 模板0 二审产出状态首页
 
@@ -101,10 +101,10 @@ next_action: <下一动作、责任人和截止时间>
 
 先记录来源命题，不在同一单元格中把主张、认定和推论合并：
 
-| issue_id | fact_id | source_role | 命题或原文 | 材料与页码 | event_time | fact_status | 反向材料 | 下游文书 |
-|---|---|---|---|---|---|---|---|---|
+| issue_id | fact_id | source_role | statement_actor | 命题或原文 | 材料与页码 | event_time | fact_status | 反向材料 | 下游文书 |
+|---|---|---|---|---|---|---|---|---|---|
 
-`source_role` 使用 `original_document`、`party_assertion`、`court_finding`、`court_recorded_undisputed`、`analysis_inference` 或 `lawyer_decision`。`fact_status` 使用 `verified`、`disputed`、`pending`、`superseded`。仅有 `party_assertion` 的命题不得改写为 `court_finding`。
+`source_role` 使用 `original_document`、`party_assertion`、`court_finding`、`court_recorded_undisputed`、`lawyer_observation`、`analysis_inference` 或 `lawyer_decision`。`statement_actor` 用于区分法院、各方、证人或其他发言者；书面原件不适用时填 `not_applicable`。`fact_status` 使用 `verified`、`disputed`、`pending`、`superseded`。律师笔记先用 `lawyer_observation + pending`，不得因记录人是律师就改写为当事人主张、分析推论或法院认定。
 
 再单列法院认定：
 
@@ -340,24 +340,27 @@ artifact_type: hearing_live_response
 hearing_context: live
 time_budget_minutes: <正整数>
 current_question: <本次需处理的问题>
-record_status: lawyer_notes | court_record_pending | court_record_verified | court_record_unavailable
+record_source: lawyer_notes | court_record | court_audio_video | other
+court_record_status: not_obtained | obtained_pending_review | verified | unavailable
 ```
+
+该庭中限时响应块是在真实庭审或法庭询问现场对“模板0 二审产出状态首页”的临时替代，只为压缩现场输入和响应范围。庭后必须回到模板0补齐完整状态首页，并把现场形成的事实状态、未核事项、律师裁决点和下一动作写入正式产出；不得把临时响应块直接当作完整阶段回执。
 
 按“材料与限制 → 必要分析 → 总结性结论 → 可当庭使用要点 → 程序请求/异议/保留意见 → 证据定位与禁止确定表述事项”的顺序输出。完整法律意见留到庭后补充核验，不得用未核实内容换取即时结论。
 
 ### 庭审偏差与待办记录（出现变化时使用）
 
-| 事件或变化 | 现场来源 | 与庭前底稿的差异 | 对当前争点的影响 | 是否需律师确认 | 庭后动作 |
-|---|---|---|---|---|---|
+| 事件或变化 | 现场来源 | 与庭前底稿的差异 | 对当前争点的影响 | 是否需律师确认 | 庭后动作 | 截止日或时间 |
+|---|---|---|---|---|---|---|
 
 可在“事件或变化”中标注 `issue_change`、`new_evidence`、`new_statement`、`position_tension`、`court_request`、`deadline` 或 `mediation_change`。`position_tension` 只触发律师复核，不自动认定自认、放弃、变更请求或越权代理。
 
 ### 庭审记录状态
 
-| record_status | 当前来源与定位 | 可否作为法院确认内容 | 核验日期与方式 | 待核或更正事项 |
-|---|---|---|---|---|
+| record_source | statement_actor | court_record_status | 当前来源与定位 | 可否作为法院确认内容 | 核验日期与方式 | 待核或更正事项 |
+|---|---|---|---|---|---|---|
 
-仅在 `court_record_verified` 时填写正式笔录的核验日期和方式。正式笔录尚未取得或客观上无法取得时，如实使用 `court_record_pending` 或 `court_record_unavailable`，不要求当庭拍照或复制。
+`record_source` 与 `court_record_status` 独立填写。律师笔记中记录谁的表述，由 `statement_actor` 标明；只有 `court_record_status: verified` 时才填写正式笔录核验日期和方式。尚未取得时使用 `not_obtained`。`unavailable` 仅用于当前存在客观障碍而无法取得正式笔录的状态，不因时间经过自动切换；取得条件变化时回到 `not_obtained` 或 `obtained_pending_review`，重新获取并审阅后才能更新为 `verified`。不要求律师当庭拍照或复制。
 
 ## 模板11 A5 调解授权与庭后补强
 
@@ -373,6 +376,8 @@ record_status: lawyer_notes | court_record_pending | court_record_verified | cou
 | 法院要求或庭审新情况 | 对应争点 | 需补材料 | 责任人 | 截止日 | 文书更新位置 | 状态 |
 |---|---|---|---|---|---|---|
 
+庭审偏差表中的庭后动作只转入本表一次；含期限的事项同时更新 A0 期限总表。
+
 ### 11.3 庭后意见骨架
 
 1. 二审审理范围与本次回应事项。
@@ -381,21 +386,45 @@ record_status: lawyer_notes | court_record_pending | court_record_verified | cou
 4. 已核实法律依据。
 5. 与上诉或答辩请求一致的结论。
 
-## 模板12 A6 裁判对比与交付报告
+## 模板12 A6 终局处理与交付报告
 
 ### 12.0 A6 入口证据
 
 ```yaml
 phase_id: A6
-second_instance_decision_path: <可读取的二审裁判路径；无则为 none>
-decision_event: <法院通知或送达事件及原始载体定位；无则为 none>
+artifact_type: terminal_status_receipt | terminal_analysis_report | delivery_archive
+terminal_document_type: judgment | ruling | mediation_statement | appeal_withdrawal_ruling | other_terminal_document | unknown
+second_instance_terminal_document_path: <可读取的二审终局文书路径；无则为 none>
+terminal_event:
+  carrier_type: court_notice | service_record | court_system_page | other_official_carrier
+  source_locator: <路径、页码、截图索引或时间点；无则为 none>
+  event_time: <时间；无则为 unknown>
+  verification_status: verified | pending | unverified
+  content_scope: status_only | full_text_available
+output_scope: procedure_status_only | full_terminal_analysis
 ```
 
-`second_instance_decision_path` 与可核验 `decision_event` 均为 `none` 时停止使用本模板。原审裁判的 `decision_path` 不能替代；此时保持 `phase_id: A5`、`run_status: waiting_external`、`waiting_for: 二审裁判`。
+`second_instance_terminal_document_path` 为 `none` 时，只有能回链官方原始载体且 `verification_status: verified` 的 `terminal_event` 才能进入本模板。原审 `decision_path`、律师记录、当事人口述、电话转述或普通即时通信信息不能替代；不满足时保持 A5 `waiting_external`。
 
-### 12.1 裁判对比
+没有可读取全文路径时，`content_scope` 固定为 `status_only`；取得完整内容后先保存并记录 `second_instance_terminal_document_path`，再使用 `full_text_available` 和完整分析分支。
 
-| 项目 | 原审裁判 | 二审裁判 | 变化 | 理由摘要与页码 | 后续影响 |
+### 12.0A 程序状态回执（尚无全文时）
+
+| 当前程序状态 | 官方载体与定位 | 事件时间 | 送达或取得情况 | 期限与待办 | 未核事项 |
+|---|---|---|---|---|---|
+
+此分支固定使用 `artifact_type: terminal_status_receipt`、`output_scope: procedure_status_only`、`run_status: waiting_external`。禁止填写下方实体结果、裁判理由、权利义务影响或履行结论。
+
+### 12.1 完整终局文书分析
+
+取得全文后改用 `output_scope: full_terminal_analysis`：
+
+- `judgment` 或 `ruling`：填写下表，逐项对比原审与二审。
+- `mediation_statement`：改为核对约定义务、生效、履行保障、违约后果和费用，不虚构法院实体认定。
+- `appeal_withdrawal_ruling`：改为核对程序终结、原审裁判状态和费用，不虚构二审实体再审理结论。
+- `other_terminal_document`：只处理可核实的程序效果并标记律师复核；`unknown` 不得进入本分支。
+
+| 项目 | 原审文书 | 二审终局文书 | 变化 | 理由或约定原文与页码 | 后续影响 |
 |---|---|---|---|---|---|
 | 诉讼请求 |  |  |  |  |  |
 | 事实认定 |  |  |  |  |  |
@@ -405,7 +434,7 @@ decision_event: <法院通知或送达事件及原始载体定位；无则为 no
 
 ### 12.2 客户报告
 
-- 二审结果和生效状态：
+- 二审终局处理和生效状态：
 - 对客户权利义务的直接影响：
 - 履行、保全、费用和送达事项：
 - 后续程序边界与需另行委托事项：
