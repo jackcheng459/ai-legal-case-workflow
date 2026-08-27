@@ -49,10 +49,10 @@ license: CC BY-NC 4.0 - 完整文本见 https://github.com/jackcheng459/ai-legal
 2. **程序隔离**：先确认 `procedure`。一审只使用 `start_stage/end_stage`，二审只使用 `start_phase/end_phase`；不得把一审阶段、期限或模板套入二审。
 3. **人类终局裁决**：不得把 AI 输出表述为律师已确认结论，不预测或承诺判决结果。
 4. **数据边界**：按绿色、黄色、红色、红线审查材料、必要性、授权和链路。红色数据仅在任务必要、授权清楚、链路可信且有人工终审时处理；红线数据不得进入普通 AI 链路、外部代理或公开仓库。
-5. **事实可追溯**：区分原始材料、当事人陈述、辅助识别、分析推论和法律评价。金额、日期、身份、证据编号及送达事实回原件复核。
-6. **法源可核验**：不得凭记忆确认法条或案例。通过当前可用的权威来源实时核实效力和现行文本；通过时标注 `【已核实：<来源名称>，YYYY-MM-DD】`，无法核实时标注 `【未经工具核实，仅供参考】`。
+5. **事实可追溯**：关键事实必须记录 `fact_id`、`source_role`、原文定位、事件时间、统计截止时间和 `fact_status`。原始材料、当事人主张、法院认定、辅助识别、分析推论和律师结论不得互相替代；金额、日期、身份、证据编号及送达事实回原件复核。仅有当事人主张或仍标“待核”的事实不得进入下游文书的确定性陈述。
+6. **法源可核验**：不得凭记忆确认法条或案例。通过当前可用的权威来源实时核实法源全称、发布机关、修订版本、效力、条号、现行原文、来源和日期；条号与现行文本不一致时阻断引用。通过时标注 `【已核实：<来源名称>，YYYY-MM-DD】`，无法核实时标注 `【未经工具核实，仅供参考】`。
 7. **工具真实状态**：只使用平台实际可用且已获授权的工具，不虚构查询、重试、协作、转换、发送或提交成功。
-8. **质量门与修订痕迹**：每阶段或阶段组完成后检查质量。未通过时停在当前步骤；不覆盖原始材料和既有定稿，新增版本并记录变化。
+8. **质量门与修订痕迹**：每阶段或阶段组完成后检查质量。未通过时停在当前步骤；不覆盖原始材料、律师修订稿和既有定稿。用户指定律师版本时记录 `authoritative_base_path`，先比较差异再另存新版本。关键事实更正后执行 `correction_cascade`，全文检查所有下游文书并标记仍含旧事实的过期版本。
 9. **专门领域闸门**：识别涉外、港澳台、知识产权、海事海商或破产衍生诉讼时，只形成要素、风险和待核验问题，标记 `specialist_review_required=true`。专项法源和专业人员复核前，不输出确定性程序结论。
 10. **二审入口闸门**：没有原审裁判文书或可核验的送达记录时，可以拆解争点，但不得认定上诉期限尚未届满或计算确定截止日；小额诉讼等一审终审案件不得生成普通上诉方案。
 
@@ -142,14 +142,22 @@ output_formats: [md]
 | `appeal_tracks` | list | 已存在的多方上诉轨道；没有时由 A0 建立 |
 | `appeal_fee_status` | enum | `unknown`、`notified`、`paid`、`overdue_risk` 或 `not_applicable` |
 | `second_instance_stage` | enum | `pre_filing`、`filed`、`responding`、`hearing`、`post_hearing`、`decided`、`delivery`；仅在未给 `start_phase` 时推定 |
+| `hearing_context` | enum | `normal` 或 `live`；仅在实际庭审、询问或法院要求现场即时回应时启用 `live` |
+| `time_budget_minutes` | int | 庭中可用分钟数；只控制分析深度和呈现长度 |
+| `current_question` | string | 庭中需要即时处理的具体问题 |
+| `record_source` | enum | `lawyer_notes`、`court_record`、`court_audio_video` 或 `other` |
+| `court_record_status` | enum | `not_obtained`、`obtained_pending_review`、`verified` 或 `unavailable` |
+| `second_instance_terminal_document_path` | string | 二审终局文书路径；仅用于 A6 入口 |
+| `terminal_document_type` | enum | `judgment`、`ruling`、`mediation_statement`、`appeal_withdrawal_ruling`、`other_terminal_document` 或 `unknown` |
+| `terminal_event` | object | 无终局文书全文时，记录法院官方载体、定位、时间、核验状态和内容范围 |
 
-`second_instance_stage` 映射：`pre_filing/filed/responding`→A0，`hearing/post_hearing`→A5，`decided/delivery`→A6。后两类从中途切入时仍须快速执行 A0 入口核验和 A1 底座完整性检查，不能跳过期限与裁判身份确认。
+`second_instance_stage` 映射：`pre_filing/filed/responding`→A0，`hearing/post_hearing`→A5，`decided/delivery`→A6。A6 须有可读终局文书或能回链官方载体的已核验 `terminal_event`；仅有事件时限于程序状态输出并等待全文。原审 `decision_path`、律师记录或当事人口述不能替代。从中途切入时仍须快速执行 A0、A1 核验。
 
 裁定上诉仅覆盖不予受理、管辖权异议和驳回起诉三类通常可上诉裁定；其他裁定或特别救济进入专项核验闸门。
 
 ### 共同可选输入
 
-`plaintiff`、`defendant`、`target_amount`、`output_formats`（默认 `[md]`）、`parallel_enabled`（默认 `true`，只表示具备资格）、`enable_mcp_tools`（授权白名单）。
+`plaintiff`、`defendant`、`target_amount`、`output_formats`（默认 `[md]`）、`parallel_enabled`（默认 `true`，只表示具备资格）、`enable_mcp_tools`（授权白名单）、`authoritative_base_path`（律师或用户明确指定的后续修订基准）。
 
 ### 输入校验
 
@@ -159,6 +167,7 @@ output_formats: [md]
 - 代理立场、当事人或裁判类型不明确时保留“待确认”，不得自行补全。
 - 二审存在多个上诉时，为每份上诉建立独立 `appeal_track`，不得把不同请求、理由和期限合并。
 - 跳过前序流程时核对已有时间线、证据编号、裁判拆解和期限核验；逐项披露缺失后才继续。
+- 指定 `authoritative_base_path` 时先确认文件存在并记录版本或内容指纹；不得退回较早 AI 草稿继续编辑。
 
 ### 输出与副作用
 
@@ -168,6 +177,7 @@ output_formats: [md]
 - `completed` 只表示约定步骤和质量门已经执行，不代表律师审核、格式转换、发送或法院提交成功。
 - 相同材料重复执行时复用已通过最低检查的产出；材料变化时新建版本，不重复有费用或外部副作用的调用。
 - 触发专项闸门时输出 `specialist_review_required`、`specialist_domains`、`trigger_facts`、`pending_questions`、`blocked_conclusions` 和 `specialist_review_status`。
+- 关键事实或法律依据发生更正时，输出 `correction_cascade`，列明更正项、依赖文书、已更新文件、保留但过期版本和未关闭冲突；存在未关闭关键冲突时不得标记 `completed`。
 
 ## 一审七阶段路由
 
@@ -193,7 +203,7 @@ output_formats: [md]
 | A3 增量与程序 | 审查新证据、新请求、程序问题和调查需求 | 增量证据表、缺口关闭计划、程序申请清单 | D3 |
 | A4 文书材料包 | 形成上诉状、答辩状或裁定上诉材料 | 二审文书、证据目录、法源核验报告 | D4 |
 | A5 庭审或询问 | 准备审理范围、发问、质证、调解和庭后补强 | 庭审或询问提纲、质证意见、庭后意见 | D5 |
-| A6 裁判与交付 | 对比原审与二审裁判、告知后续边界并归档 | 裁判对比、客户报告、归档与交接清单 | D6 |
+| A6 终局处理与交付 | 按终局文书或已核验官方事件确定输出范围并归档 | 状态回执、终局文书分析、客户报告与交接清单 | D6 |
 
 详细步骤、裁定上诉边界和多上诉轨道见 `references/appeal-workflow.md`；固定结构见 `references/appeal-templates.md`；D0–D6 见 `references/appeal-quality-checklist.md`。
 
@@ -204,9 +214,10 @@ output_formats: [md]
 3. 全量读取该阶段所需材料，记录不可读、缺失和冲突文件。
 4. 需要固定结构时，只读取对应模板章节。
 5. 生成工作底稿，将关键事实和裁判判断回链到原始材料。
-6. 运行通用质量检查及一审或二审专项质量门。
-7. 报告已完成、未完成、未经核实和需要律师裁决的事项。
-8. 质量门通过后才进入下一阶段；用户要求暂停时立即停止。
+6. 对关键主体、金额、日期、来源角色和法源版本运行全文冲突检查；事实或法律更正时完成下游修订传播。
+7. 运行通用质量检查及一审或二审专项质量门。
+8. 报告已完成、未完成、未经核实和需要律师裁决的事项。
+9. 质量门通过后才进入下一阶段；用户要求暂停时立即停止。
 
 ## 协作与回退
 
@@ -221,10 +232,12 @@ output_formats: [md]
 - 材料是否完整读取，不可读文件是否记录。
 - 事实、原审认定和主张是否回链到原始载体。
 - 主体、金额、日期、送达、证据编号和上诉轨道是否一致。
+- 关键事实是否标明来源角色、原文定位和核验状态；关键金额是否绑定事件时间、统计截止时间、公式与来源。
 - 法源是否核实效力、原文和来源。
 - 期限是否写明文件类型、送达事实、起算依据、届满日、办理动作和复核人。
 - 策略建议是否列出成立条件、预期作用、风险、证据缺口和律师裁决点，而非只给单一答案。
 - AI 草稿、律师待复核和律师已定稿是否区分。
+- 律师指定基准是否被完整保留，事实更正是否传播到全部下游产出，过期版本是否已显式标记。
 - `run_status` 与实际范围是否一致，格式和外部动作是否单独验证。
 
 ## 参考文件加载表
